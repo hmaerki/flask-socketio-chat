@@ -15,8 +15,22 @@ $(document).ready(function() {
 	});
 
 	socket.on('message', function(msg) {
-		$("#messages").append('<li>'+msg+'</li>');
-		console.log('Received message');
+		console.log('Received: ' + msg);
+		var i = msg.indexOf(':');
+		var method = msg.slice(0, i)
+		var text = msg.slice(i+1)
+		if (method == 'MESSAGE') {
+		    $("#messages").append('<li>'+text+'</li>');
+		}
+		if (method == 'TIME') {
+		    $("#time").html(text);
+		}
+		// if (msg.startsWith('MESSAGE:')) {
+		//     $("#messages").append('<li>'+msg+'</li>');
+		// }
+		// if (msg.startsWith('TIME:')) {
+		//     $("#time").html(msg);
+		// }
 	});
 
 	$('#sendbutton').on('click', function() {
@@ -29,5 +43,6 @@ $(document).ready(function() {
 <ul id="messages"></ul>
 <input type="text" id="myMessage">
 <button id="sendbutton">Send</button>
+<p id="time">The time</p>
 </body>
 </html>
