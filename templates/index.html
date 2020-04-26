@@ -24,10 +24,12 @@ $(document).ready(function() {
 		    $("#messages").append('<li>'+text+'</li>');
 
 			if (text.startsWith('#')) {
+
+
 				// get elements in group
-				var elements = $('#svg_board g.my-group .my-element').each(function() {
-					this.instance.animate().fill(text)
-				})	
+				// var elements = $('#svg_board g.my-group .my-element').each(function() {
+				// 	this.instance.animate().fill(text)
+				// })	
 			}
 		}
 		if (method == 'TIME') {
@@ -73,12 +75,17 @@ $(document).ready(function() {
 	// add elements
 	var draw   = SVG().addTo('#svg_board')
 	var group  = draw.group().addClass('my-group')
-	var rect   = group.rect(100,100).addClass('my-element')
+	var rect   = group.rect({id:122, width:100, height:100}).addClass('my-element')
+	var rect   = group.rect({id:123, width:100, height:100}).addClass('my-element')
 	var circle = group.circle(100).addClass('my-element').move(100, 100)
 
 	// get elements in group
 	var elements = $('#svg_board svg g.my-group .my-element').each(function() {
-	    this.instance.animate().fill('#f45')
+	    this.instance.animate().fill('#00f')
+	})
+
+	var elements = $('#svg_board g.my-group #123').each(function() {
+		this.instance.animate().fill('#f00')
 	})
 </script>
 </body>
