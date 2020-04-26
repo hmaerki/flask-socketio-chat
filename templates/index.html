@@ -2,7 +2,8 @@
 <head>
 <title>Chat Room</title>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
 </head>
 <body>
 <script type="text/javascript">
@@ -21,6 +22,13 @@ $(document).ready(function() {
 		var text = msg.slice(i+1)
 		if (method == 'MESSAGE') {
 		    $("#messages").append('<li>'+text+'</li>');
+
+			if (text.startsWith('#')) {
+				// get elements in group
+				var elements = $('#svg_board g.my-group .my-element').each(function() {
+					this.instance.animate().fill(text)
+				})	
+			}
 		}
 		if (method == 'TIME') {
 		    $("#time").html(text);
@@ -31,18 +39,47 @@ $(document).ready(function() {
 		// if (msg.startsWith('TIME:')) {
 		//     $("#time").html(msg);
 		// }
+
 	});
 
 	$('#sendbutton').on('click', function() {
 		socket.send($('#myMessage').val());
 		$('#myMessage').val('');
+
 	});
 
 });
+
 </script>
 <ul id="messages"></ul>
 <input type="text" id="myMessage">
 <button id="sendbutton">Send</button>
 <p id="time">The time</p>
+<!-- https://www.w3schools.com/graphics/svg_examples.asp -->
+<!-- https://svgjs.com/docs/3.0/ -->
+<id id="svg_board" height="180" width="500"/>
+
+<!--
+  <svg id="svg_board" height="180" width="500">
+	  <g>
+	<circle id="circle" cx="80" cy="80" r="10" stroke="black" stroke-width="3" fill="red" />
+	<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160" style="fill:white;stroke:red;stroke-width:4" />
+	  </g>
+	Sorry, your browser does not support inline SVG.
+  </svg>
+
+-->
+<script type="text/javascript">
+	// add elements
+	var draw   = SVG().addTo('#svg_board')
+	var group  = draw.group().addClass('my-group')
+	var rect   = group.rect(100,100).addClass('my-element')
+	var circle = group.circle(100).addClass('my-element').move(100, 100)
+
+	// get elements in group
+	var elements = $('#svg_board svg g.my-group .my-element').each(function() {
+	    this.instance.animate().fill('#f45')
+	})
+</script>
 </body>
 </html>
