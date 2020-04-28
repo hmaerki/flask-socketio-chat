@@ -1,6 +1,6 @@
 {
-    "python.linting.pylintEnabled": false,
-    "python.linting.mypyEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": false,
     "python.linting.enabled": true,
-    "python.pythonPath": "/home/maerki/.pyenv/versions/3.7.3/bin/python3.7"
+    "python.pythonPath": "C:\\Users\\maerki\\AppData\\Local\\Programs\\Python\\Python37-32\\python.exe"
 }

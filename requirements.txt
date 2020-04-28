@@ -1,1 +1,6 @@
-flask_socketio
+Flask
+Flask-Login
+Flask-Session
+Flask_SocketIO
+python-engineio
+python-socketio
