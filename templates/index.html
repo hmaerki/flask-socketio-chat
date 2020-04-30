@@ -1,6 +1,40 @@
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
-<title>Chat Room</title>
+<title>Online Dog</title>
+<style media="screen">
+  pre.code {
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+      padding: 10px;
+      height: 280px;
+      overflow: auto;
+      background: #181818;
+      border: solid 2px #181818;
+  }
+  .draggable {
+    cursor: move;
+  }
+  .colorchange {
+    background: #888;
+  }
+  #codelines {
+      display: none;
+  }
+  #svg {
+      -moz-border-radius: 10px;
+      -webkit-border-radius: 10px;
+      border-radius: 10px;
+      border: solid 2px #ccc;
+      width: 300px;
+      height: 500px;
+      float: left;
+      margin-right: 10px;
+      font: 1em source-sans-pro, Source Sans Pro, Helvetica, sans-serif;
+  }
+</style>
+
 <script
   src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
   integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I="
@@ -18,7 +52,6 @@
   crossorigin="anonymous"></script>
 -->
 
-<script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
 
 </head>
 <body>
@@ -43,8 +76,10 @@ $(document).ready(function() {
 
       if (text.startsWith('#')) {
         // get elements in group
-        var elements = $('#svg_board g.my-group .my-element').each(function() {
-          this.instance.animate().fill(text)
+        // var elements = $('#svg g .colorchange').each(function() {
+        var elements = $('#svg .colorchange').each(function() {
+          this.setAttribute("r", "30");
+          this.setAttribute("fill", text);
         })
         // A global variable may be accessed!!!
       }
@@ -70,59 +105,79 @@ $(document).ready(function() {
 });
 
 </script>
+
+
 <ul id="messages"></ul>
-<input type="text" id="myMessage">
+<input type="text" id="myMessage" value="#f00" />
 <button id="sendbutton">Send</button>
 <p id="time">The time</p>
+<script src="static/js/snap.svg.js"></script>
+
 <!-- https://www.w3schools.com/graphics/svg_examples.asp -->
 <!-- https://svgjs.com/docs/3.0/ -->
-<id id="svg_board" height="180" width="500"/>
+<!-- <id id="svg" height="180" width="500"/> -->
+<svg id="svg"></svg>
 
-<!--
-  <svg id="svg_board" height="180" width="500">
-    <g>
-  <circle id="circle" cx="80" cy="80" r="10" stroke="black" stroke-width="3" fill="red" />
-  <polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160" style="fill:white;stroke:red;stroke-width:4" />
-    </g>
-  Sorry, your browser does not support inline SVG.
-  </svg>
-
--->
 <script type="text/javascript">
-  // add elements
-  var draw   = SVG().addTo('#svg_board')
-  var group  = draw.group().addClass('my-group')
-  var rect   = group.rect({id:122, width:100, height:100}).addClass('my-element')
-  var rect2   = group.rect({id:123, width:100, height:100}).fill('#0FF').move(50, 20)
-  var circle = group.circle(100).addClass('my-element').move(100, 100)
-  
-  rect2.draggable()
-  // bind
-  // rect2.on('dragstart.namespace', function (event) {
-  //   // event.detail.event hold the given data explained below
-  //   // this == rect
-  //   console.log('dragstart')
-  //   console.log(this)
-  //   console.debug(event)
-  // })
+  // First lets create our drawing surface out of existing SVG element
+  // If you want to create new surface just provide dimensions
+  // like s = Snap(800, 600);
+  // var s = Snap("#svg");
+  var s = Snap("#svg");
+  // var s = Snap();
+  // Lets create big circle in the middle:
+  var circleColorChange = s.circle(10, 10, 20);
+  circleColorChange.attr({
+      class:"colorchange"
+  });
 
-  rect2.on('dragmove.namespace', e => {
-    const { handler, box } = e.detail
-    console.log('dragstart')
-    e.preventDefault()
+  var circleA = s.circle(150, 150, 100);
+  // By default its black, lets change its attributes
+  circleA.attr({
+      fill: "#bada55",
+      stroke: "#000",
+      strokeWidth: 5,
+      class:"draggable"
+  });
 
-    handler.move(box.x, box.y)
-    // handler.move(box.x - (box.x % 50), box.y - (box.y % 50))
-})
+  // Now lets create another small circle:
+  var circleB = s.circle(100, 150, 70);
+  // Lets put this small circle and another one into a group:
+  var discs = s.group(circleB, s.circle(200, 150, 70));
+  // Now we can change attributes for the whole group
+  discs.attr({
+      fill: "#fff"
+  });
 
-  // get elements in group
-  var elements = $('#svg_board svg g.my-group .my-element').each(function() {
-      this.instance.animate().fill('#00f')
+  var board = s.image("static/img/20030731_181107_dog_4.jpg");
+  board.attr({
+    x:10,
+    y:300,
+    class:"draggable"
   })
 
-  var elements = $('#svg_board g.my-group #122').each(function() {
-    this.instance.animate().fill('#f00')
-  })
+  // Despite our small circle now is a part of a group
+  // and a part of a mask we could still access it:
+  circleB.animate({r: 50}, 1000);
+  // We don’t have reference for second small circle,
+  // but we could easily grab it with CSS selectors:
+  discs.select("circle:nth-child(2)").animate({r: 50}, 1000);
+
+  var move = function(dx,dy) {
+      this.attr({
+                  transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
+              });
+  }
+
+  var start = function() {
+          this.data('origTransform', this.transform().local );
+  }
+  var stop = function() {
+          console.log('finished dragging');
+  }
+  circleA.drag(move, start, stop)
+  board.drag()
 </script>
+
 </body>
 </html>
