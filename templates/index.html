@@ -56,14 +56,24 @@
 </head>
 <body>
   <script type="text/javascript">
-$(document).ready(function() {
-  var socket = io.connect('http://' + document.domain + ':' + location.port);
+var DogApp = {
+  TIMEOUT_MS:100
+};
 
-  socket.on('connect', function() {
-    socket.send('User has connected!');
+$(document).ready(function() {
+  DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
+
+  DogApp.socket.on('connect', function() {
+    DogApp.socket.send('User has connected!');
   });
 
-  socket.on('message', function(msg) {
+  DogApp.socket.on('json', function(json) {
+    console.log('Received Json: ' + json["dx"]);
+    // DogApp.moveCircle(json["dx"], json["dy"])
+    DogApp.moveCircle(json["transform"])
+  });
+
+  DogApp.socket.on('message', function(msg) {
     console.log('Received: ' + msg);
     var i = msg.indexOf(':');
     var method = msg.slice(0, i)
@@ -97,9 +107,8 @@ $(document).ready(function() {
   });
 
   $('#sendbutton').on('click', function() {
-    socket.send($('#myMessage').val());
+    DogApp.socket.send($('#myMessage').val());
     $('#myMessage').val('');
-
   });
 
 });
@@ -163,17 +172,51 @@ $(document).ready(function() {
   // but we could easily grab it with CSS selectors:
   discs.select("circle:nth-child(2)").animate({r: 50}, 1000);
 
+  // DogApp.moveCircle = function(dx, dy) {
+  DogApp.moveCircle = function(transform) {
+    // transform = circleA.transform().local + (circleA.transform().local ? "T" : "t") + [dx, dy]
+    console.log("transform: " + transform)
+    circleColorChange.attr({
+      transform: transform
+    });
+    board.attr({
+      transform: transform
+    });
+  }
+
   var move = function(dx,dy) {
+      transform = this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
       this.attr({
-                  transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
-              });
+        transform: transform
+      });
+      // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
+      DogApp.move_msg = {id: this.id, transform: transform}
+      move_emit()
+  }
+  
+  var move_emit = function() {
+      elapsed_ms = Date.now() - DogApp.move_last_s
+      if (elapsed_ms > DogApp.TIMEOUT_MS) {
+          // DogApp.socket.emit("move", {id: this.id, dx: dx, dy: dy});
+          DogApp.socket.emit("move", DogApp.move_msg);
+          DogApp.move_last_s = Date.now()
+          return
+      }
+      function delayedEmit() {
+          console.log('delayedEmit');
+          move_emit()
+      }
+
+      clearTimeout(DogApp.move_timer_id)
+      DogApp.move_timer_id = setTimeout(delayedEmit, DogApp.TIMEOUT_MS+100-elapsed_ms);
   }
 
   var start = function() {
-          this.data('origTransform', this.transform().local );
+      this.data('origTransform', this.transform().local );
+      DogApp.move_last_s = 0.0
   }
   var stop = function() {
-          console.log('finished dragging');
+      console.log('finished dragging');
   }
   circleA.drag(move, start, stop)
   board.drag()

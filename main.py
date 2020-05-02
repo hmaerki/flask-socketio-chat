@@ -10,8 +10,14 @@ socketio = flask_socketio.SocketIO(app)
 
 @socketio.on('message')
 def handleMessage(msg):
-  print(f'Message: {msg}')
+  print(f'Message: {msg}\n')
   socketio.send(f'MESSAGE:{msg}', broadcast=True)
+
+@socketio.on('move')
+def handleMove(json):
+  print(f'Json: {json}\n')
+  # socketio.send(dict(dx=json['dx'], dy=json['dy']), json=True)
+  socketio.send(dict(transform=json['transform']), json=True)
 
 @app.route('/')
 def index():
