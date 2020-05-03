@@ -1,6 +1,6 @@
 import time
-import threading
 
+import eventlet
 import flask
 import flask_socketio
 
@@ -14,11 +14,13 @@ https://medium.com/hackervalleystudio/weekend-project-part-2-turning-flask-into-
 https://medium.com/hackervalleystudio/weekend-project-part-3-centralizing-state-management-with-vuex-5f4387ebc144
 '''
 params = dict(
-	ping_timeout=100,
-	ping_interval=50,
+	# ping_timeout=1000,
+	# ping_interval=5000,
     cors_allowed_origins='*',
-    # async_mode='eventlet'
-    async_mode='threading'
+    logger=True,
+    engineio_logger=False,
+    async_mode='eventlet'
+    # async_mode='threading'
 )
 # socketio = flask_socketio.SocketIO(app, ping_timeout=20, ping_interval=10)
 socketio = flask_socketio.SocketIO(app, **params)
@@ -32,7 +34,7 @@ def handleMessage(msg):
 def handleMove(json):
     print(f'Json: {json}\n')
     # socketio.send(dict(dx=json['dx'], dy=json['dy']), json=True)
-    socketio.send(dict(transform=json['transform']), json=True)
+    socketio.send(dict(transform=json['transform']), json=True, broadcast=True)
 
 @app.route('/')
 def index():
@@ -45,25 +47,20 @@ def debugjson():
     if content_type == 'application/x-www-form-urlencoded':
         data_json = flask.json.loads(flask.request.get_data().decode("utf-8"))
         print(f'debugjson: {data_json}\n')
-        socketio.send(data_json, json=True)
+        socketio.send(data_json, json=True, broadcast=True)
         return 'Yes'
     return 'No'
 
     # curl -X POST -H 'Content-Type: application/json' http://localhost:5000/debugjson -d '{"name": "Alice"}' 
 
-class Timer(threading.Thread):
-    def __init__(self, socketio):
-        threading.Thread.__init__(self)
-        self.socketio = socketio
-
-    def run(self):
-        while True:
-            time.sleep(1.0)
-            msg = time.strftime('%H:%M:%S')
-            socketio.send(f'TIME:{msg}')
+def timer_run():
+    while True:
+        str_time = time.strftime('%H:%M:%S')
+        socketio.send(f'TIME:{str_time}', broadcast=True)
+        # socketio.send(dict(time=str_time), json=True, broadcast=True)
+        eventlet.sleep(1.0)
 
 if __name__ == '__main__':
-    timer = Timer(socketio)
-    timer.start()
+    eventlet.spawn(timer_run)
 
     socketio.run(app)

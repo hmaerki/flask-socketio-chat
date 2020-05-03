@@ -26,7 +26,7 @@
 <body>
   <script type="text/javascript">
     var DogApp = {
-      TIMEOUT_MS: 100
+      TIMEOUT_MS: 20
     };
 
     $(document).ready(function () {
@@ -37,13 +37,13 @@
       });
 
       DogApp.socket.on('json', function (json) {
-        console.log('Received Json: ' + json["dx"]);
+        console.log('Received "json": ' + JSON.stringify(json));
         // DogApp.moveCircle(json["dx"], json["dy"])
         DogApp.moveCircle(json["transform"])
       });
 
       DogApp.socket.on('message', function (msg) {
-        console.log('Received: ' + msg);
+        console.log('Received "message": ' + msg);
         var i = msg.indexOf(':');
         var method = msg.slice(0, i)
         var text = msg.slice(i + 1)
@@ -138,7 +138,7 @@
           <td>
             <form>
               <p> I am
-                <input type="text" id="myMessage" value="Donald" />
+                <input type="text" id="myName" value="Donald" />
                 <button id="sendbutton">ok</button>
               </p>
             </form>
