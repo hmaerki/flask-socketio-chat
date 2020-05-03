@@ -1,21 +1,21 @@
-{
-  "set_svg": {
-    "id": "#svg .colorchange",
-    "attributes": {
+[
+  {
+    "svg_id": "#svg .colorchange",
+    "attr_set": {
       "r": "30",
       "fill": "#F00"
     }
   },
-  "call_html": {
-    "id": "#time",
-    "calls": {
+  {
+    "html_id": "#time",
+    "call": {
       "html": "It is 11:00"
     }
   },
-  "set_html": {
-    "id": "#button_play_0",
-    "attributes": {
-      "disabled": false
+  {
+    "html_id": "#button_play_0",
+    "attr_set": {
+      "disabled": null
     }
   }
-}
+]

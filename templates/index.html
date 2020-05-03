@@ -39,35 +39,24 @@
       DogApp.socket.on('json', function (json) {
         console.log('Received "json": ' + JSON.stringify(json));
         DogApp.moveCircle(json["transform"])
-        for (var method_key in json) {
-          method_value = json[method_key]
-          if (method_key === 'set_svg') {
-            svg_id = method_value['id']
+        for (var i = 0; i < json.length; i++) { 
+          var command = json[i]
+          var svg_id = command['svg_id']
+          if (svg_id) {
             var svg_element = $(svg_id);
-            svg_attributes = method_value['attributes']
-            var elements = svg_element.each(function () {
-              for (var svg_attribute in svg_attributes) {
-                svg_attribute_value = svg_attributes[svg_attribute];
-                this.setAttribute(svg_attribute, svg_attribute_value);
-              };
-            });
-          };
-          if (method_key === 'set_html') {
-            html_id = method_value['id']
-            var html_element = $(html_id);
-            html_attributes = method_value['attributes']
-            var elements = html_element.each(function () {
-              for (var html_attribute_name in html_attributes) {
-                html_attribute_value = html_attributes[html_attribute_name];
-                console.log('html_attribute_name:' + html_attribute_name)
-                console.log('html_attribute_value:' + html_attribute_value)
-                console.log('before:' + this.getAttribute(html_attribute_name))
-                this.setAttribute(html_attribute_name, html_attribute_value);
-                console.log('after:' + this.getAttribute(html_attribute_name))
-              };
-            });
-          };
-          if (method_key === 'call_html') {
+            attr_set = command['attr_set']
+            if (attr_set) {
+              var elements = svg_element.each(function () {
+                for (var attr_name in attr_set) {
+                  attr_value = attr_set[attr_name];
+                  this.setAttribute(attr_name, attr_value);
+                };
+              });
+            }
+            continue
+          }
+          html_id = command['html_id']
+          if (html_id) {
             // Correspnds to:
             // "call_html": {
             //     "id": "#time",
@@ -76,14 +65,29 @@
             //     }
             // }
             // $("#time").html(str_time);
-            html_id = method_value['id']
             var html_element = $(html_id);
-            html_calls = method_value['calls']
-            for (var html_call in html_calls) {
-              html_call_argument = html_calls[html_call];
-              html_element[html_call].call(html_element, html_call_argument)
-            };
-          };
+            html_calls = command['call']
+            if (html_calls) {
+              for (var html_call in html_calls) {
+                html_call_argument = html_calls[html_call];
+                html_element[html_call].call(html_element, html_call_argument)
+              };
+            }
+            attr_set = command['attr_set']
+            if (attr_set) {
+              var elements = html_element.each(function () {
+                for (var attr_name in attr_set) {
+                  attr_value = attr_set[attr_name];
+                  if (attr_value === null) {
+                    this.removeAttribute(attr_name);
+                  } else {
+                    this.setAttribute(attr_name, attr_value);
+                  }
+                };
+              });
+            }
+            continue
+          }
         };
       });
 
