@@ -56,8 +56,15 @@ def debugjson():
 def timer_run():
     while True:
         str_time = time.strftime('%H:%M:%S')
-        socketio.send(f'TIME:{str_time}', broadcast=True)
-        # socketio.send(dict(time=str_time), json=True, broadcast=True)
+        data_json = {
+            "call_html": {
+                "id": "#time",
+                "calls": {
+                    "html": str_time
+                }
+            }
+        }
+        socketio.send(data_json, json=True, broadcast=True)
         eventlet.sleep(1.0)
 
 if __name__ == '__main__':

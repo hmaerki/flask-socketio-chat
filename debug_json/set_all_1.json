@@ -1,0 +1,15 @@
+{
+  "set_svg": {
+    "id": "#svg .colorchange",
+    "attributes": {
+      "r": "30",
+      "fill": "#F00"
+    }
+  },
+  "call_html": {
+    "id": "#time",
+    "calls": {
+      "html": "It is 11:00"
+    }
+  }
+}

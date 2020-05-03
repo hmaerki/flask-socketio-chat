@@ -38,8 +38,38 @@
 
       DogApp.socket.on('json', function (json) {
         console.log('Received "json": ' + JSON.stringify(json));
-        // DogApp.moveCircle(json["dx"], json["dy"])
         DogApp.moveCircle(json["transform"])
+        for (var method_key in json) {
+          method_value = json[method_key]
+          if (method_key === 'set_svg') {
+            svg_id = method_value['id']
+            var svg_element = $(svg_id);
+            svg_attributes = method_value['attributes']
+            var elements = svg_element.each(function () {
+              for (var svg_attribute in svg_attributes) {
+                svg_attribute_value = svg_attributes[svg_attribute];
+                this.setAttribute(svg_attribute, svg_attribute_value);
+              };
+            });
+          };
+          if (method_key === 'call_html') {
+            // Correspnds to:
+            // "call_html": {
+            //     "id": "#time",
+            //     "calls": {
+            //         "html": str_time
+            //     }
+            // }
+            // $("#time").html(str_time);
+            html_id = method_value['id']
+            var html_element = $(html_id);
+            html_calls = method_value['calls']
+            for (var html_call in html_calls) {
+              html_call_argument = html_calls[html_call];
+              html_element[html_call].call(html_element, html_call_argument)
+            };
+          }
+        }
       });
 
       DogApp.socket.on('message', function (msg) {
@@ -49,30 +79,7 @@
         var text = msg.slice(i + 1)
         if (method == 'MESSAGE') {
           $("#messages").append('<li>' + text + '</li>');
-
-          // rect.width(120)
-          // rect.fill('#000') // width:100
-
-          if (text.startsWith('#')) {
-            // get elements in group
-            // var elements = $('#svg g .colorchange').each(function() {
-            var elements = $('#svg .colorchange').each(function () {
-              this.setAttribute("r", "30");
-              this.setAttribute("fill", text);
-            })
-            // A global variable may be accessed!!!
-          }
         }
-        if (method == 'TIME') {
-          $("#time").html(text);
-        }
-        // if (msg.startsWith('MESSAGE:')) {
-        //     $("#messages").append('<li>'+msg+'</li>');
-        // }
-        // if (msg.startsWith('TIME:')) {
-        //     $("#time").html(msg);
-        // }
-
       });
 
       $('#sendbutton').on('click', function () {
