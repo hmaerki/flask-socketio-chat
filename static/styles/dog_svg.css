@@ -1,0 +1,31 @@
+pre.code {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  height: 280px;
+  overflow: auto;
+  background: #181818;
+  border: solid 2px #181818;
+}
+.draggable {
+cursor: move;
+}
+.colorchange {
+background: #888;
+}
+#codelines {
+  display: none;
+}
+#svg {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  border: solid 2px #ccc;
+  width: 95%;
+  height: 95%;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  font: 1em source-sans-pro, Source Sans Pro, Helvetica, sans-serif;
+}
