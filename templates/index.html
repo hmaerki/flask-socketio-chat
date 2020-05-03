@@ -26,7 +26,7 @@
 <body>
   <script type="text/javascript">
     var DogApp = {
-      TIMEOUT_MS: 20
+      DUMMY: 20
     };
 
     $(document).ready(function () {
@@ -244,25 +244,8 @@
         transform: transform
       });
       // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
-      DogApp.move_msg = { id: this.id, transform: transform }
-      move_emit()
-    }
-
-    var move_emit = function () {
-      elapsed_ms = Date.now() - DogApp.move_last_s
-      if (elapsed_ms > DogApp.TIMEOUT_MS) {
-        // DogApp.socket.emit("move", {id: this.id, dx: dx, dy: dy});
-        DogApp.socket.emit("move", DogApp.move_msg);
-        DogApp.move_last_s = Date.now()
-        return
-      }
-      function delayedEmit() {
-        console.log('delayedEmit');
-        move_emit()
-      }
-
-      clearTimeout(DogApp.move_timer_id)
-      DogApp.move_timer_id = setTimeout(delayedEmit, DogApp.TIMEOUT_MS + 100 - elapsed_ms);
+      move_msg = { id: this.id, transform: transform }
+      DogApp.socket.emit("move", move_msg);
     }
 
     var start = function () {

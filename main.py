@@ -61,7 +61,7 @@ def debugjson():
         return 'Yes'
     return 'No'
 
-    # curl -X POST -H 'Content-Type: application/json' http://localhost:5000/debugjson -d '{"name": "Alice"}' 
+    # curl -X POST http://localhost:5000/debugjson -d @set_all_1.json 
 
 def timer_run():
     while True:
