@@ -30,6 +30,10 @@ def handleMessage(msg):
     print(f'Message: {msg}\n')
     socketio.send(f'MESSAGE:{msg}', broadcast=True)
 
+@socketio.on('setname')
+def handleSetname(json):
+    print(f'Json: {json}\n')
+
 @socketio.on('move')
 def handleMove(json):
     print(f'Json: {json}\n')
@@ -68,6 +72,6 @@ def timer_run():
         eventlet.sleep(1.0)
 
 if __name__ == '__main__':
-    eventlet.spawn(timer_run)
+    # eventlet.spawn(timer_run)
 
     socketio.run(app)

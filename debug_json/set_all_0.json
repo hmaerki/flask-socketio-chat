@@ -11,5 +11,11 @@
     "calls": {
       "html": "It is 10:00"
     }
+  },
+  "set_html": {
+    "id": "#button_play_0",
+    "attributes": {
+      "disabled": true
+    }
   }
 }

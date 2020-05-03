@@ -52,6 +52,21 @@
               };
             });
           };
+          if (method_key === 'set_html') {
+            html_id = method_value['id']
+            var html_element = $(html_id);
+            html_attributes = method_value['attributes']
+            var elements = html_element.each(function () {
+              for (var html_attribute_name in html_attributes) {
+                html_attribute_value = html_attributes[html_attribute_name];
+                console.log('html_attribute_name:' + html_attribute_name)
+                console.log('html_attribute_value:' + html_attribute_value)
+                console.log('before:' + this.getAttribute(html_attribute_name))
+                this.setAttribute(html_attribute_name, html_attribute_value);
+                console.log('after:' + this.getAttribute(html_attribute_name))
+              };
+            });
+          };
           if (method_key === 'call_html') {
             // Correspnds to:
             // "call_html": {
@@ -68,8 +83,8 @@
               html_call_argument = html_calls[html_call];
               html_element[html_call].call(html_element, html_call_argument)
             };
-          }
-        }
+          };
+        };
       });
 
       DogApp.socket.on('message', function (msg) {
@@ -82,11 +97,11 @@
         }
       });
 
-      $('#sendbutton').on('click', function () {
-        DogApp.socket.send($('#myMessage').val());
-        $('#myMessage').val('');
+      $('#name_button').on('click', function () {
+        name_element = $('#textfield_name')
+        click_msg = { name: name_element.val() }
+        DogApp.socket.emit("setname", click_msg);
       });
-
     });
 
   </script>
@@ -94,8 +109,6 @@
 
     <header>
       <ul id="messages"></ul>
-      <input type="text" id="myMessage" value="#f00" />
-      <button id="sendbutton">Send</button>
       <p id="time">The time</p>
       <!-- <div class="example"> -->
     </header>
@@ -122,20 +135,20 @@
           <td>2</td>
         </tr>
         <tr>
-          <td><button id="sendbutton">Play</button></td>
-          <td><button id="sendbutton">Play</button></td>
-          <td><button id="sendbutton">Play</button></td>
-          <td><button id="sendbutton">Play</button></td>
-          <td><button id="sendbutton">Play</button></td>
-          <td><button id="sendbutton">Play</button></td>
+          <td><button id="button_play_0">Play</button></td>
+          <td><button id="button_play_1">Play</button></td>
+          <td><button id="button_play_2">Play</button></td>
+          <td><button id="button_play_3">Play</button></td>
+          <td><button id="button_play_4">Play</button></td>
+          <td><button id="button_play_5">Play</button></td>
         </tr>
         <tr>
-          <td><button id="sendbutton">Change</button></td>
-          <td><button id="sendbutton">Change</button></td>
-          <td><button id="sendbutton">Change</button></td>
-          <td><button id="sendbutton">Change</button></td>
-          <td><button id="sendbutton">Change</button></td>
-          <td><button id="sendbutton">Change</button></td>
+          <td><button id="button_change_0">Change</button></td>
+          <td><button id="button_change_1">Change</button></td>
+          <td><button id="button_change_2">Change</button></td>
+          <td><button id="button_change_3">Change</button></td>
+          <td><button id="button_change_4">Change</button></td>
+          <td><button id="button_change_5">Change</button></td>
         </tr>
       </table>
     </footer>
@@ -145,14 +158,14 @@
           <td>
             <form>
               <p> I am
-                <input type="text" id="myName" value="Donald" />
-                <button id="sendbutton">ok</button>
+                <input type="text" id="textfield_name" value="D.T." />
+                <button id="name_button">Send</button>
               </p>
             </form>
           </td>
-          <td><button id="sendbutton">Undo last move</button></td>
-          <td><button id="sendbutton">Become next player</button></td>
-          <td><button id="sendbutton">New Game</button></td>
+          <td><button id="button_todo">Undo last move</button></td>
+          <td><button id="button_todo">Become next player</button></td>
+          <td><button id="button_todo">New Game</button></td>
         </tr>
       </table>
     </footer>
