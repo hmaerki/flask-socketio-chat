@@ -38,7 +38,6 @@
 
       DogApp.socket.on('json', function (json) {
         console.log('Received "json": ' + JSON.stringify(json));
-        DogApp.moveCircle(json["transform"])
         for (var i = 0; i < json.length; i++) { 
           var command = json[i]
           var svg_id = command['svg_id']
@@ -52,6 +51,10 @@
                   this.setAttribute(attr_name, attr_value);
                 };
               });
+            }
+            transform = command['transform']
+            if (transform) {
+              DogApp.moveCircle(transform)              
             }
             continue
           }
@@ -229,9 +232,10 @@
       circleColorChange.attr({
         transform: transform
       });
-      board.attr({
-        transform: transform
-      });
+      board.animate({ transform: transform}, 100)
+      // board.attr({
+      //   transform: transform
+      // });
     }
 
     var move = function (dx, dy) {

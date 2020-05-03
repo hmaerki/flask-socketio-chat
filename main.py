@@ -38,7 +38,13 @@ def handleSetname(json):
 def handleMove(json):
     print(f'Json: {json}\n')
     # socketio.send(dict(dx=json['dx'], dy=json['dy']), json=True)
-    socketio.send(dict(transform=json['transform']), json=True, broadcast=True)
+    json_command = [
+        {
+            "svg_id": "#svg .colorchange",
+            "transform":  json['transform']
+        },
+    ]
+    socketio.send(json_command, json=True, broadcast=True)
 
 @app.route('/')
 def index():
