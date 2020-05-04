@@ -19,8 +19,6 @@
   integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
   crossorigin="anonymous"></script>
 -->
-
-
 </head>
 
 <body>
@@ -105,9 +103,14 @@
       });
 
       $('#name_button').on('click', function () {
-        name_element = $('#textfield_name')
-        click_msg = { name: name_element.val() }
+        name_element = $('#textfield_name');
+        click_msg = { name: name_element.val() };
         DogApp.socket.emit("setname", click_msg);
+      });
+
+      $('#button_newGame').on('click', function () {
+        click_msg = { event: "newGame" };
+        DogApp.socket.emit("event", click_msg);
       });
     });
 
@@ -172,7 +175,7 @@
           </td>
           <td><button id="button_todo">Undo last move</button></td>
           <td><button id="button_todo">Become next player</button></td>
-          <td><button id="button_todo">New Game</button></td>
+          <td><button id="button_newGame">Neues Spiel</button></td>
         </tr>
       </table>
     </footer>
