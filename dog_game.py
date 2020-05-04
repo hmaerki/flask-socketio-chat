@@ -106,6 +106,9 @@ class PlayerState:
         cards_text = [name(card) for card in self.__cards]
         return f'{self.__player.colorID} changeIndex={self.__cardToBeChangedIndex} cards={",".join(cards_text)}'
 
+    def setName(self, name:str):
+        self.__name = name
+
     def serveCards(self, cards: list) -> None:
         self.__cards = cards
 
@@ -162,6 +165,9 @@ class GameState:
 
     def getAssistance(self):
         return self.__statemachine.getAssistance()
+
+    def setName(self, player:int, name:str):
+        return self.__player_state[player].setName(name)
 
     def cardToBeChanged(self, player:int, index:int):
         return self.__player_state[player].cardToBeChanged(index)
@@ -231,6 +237,11 @@ class GameStateExchangeCards(GameStatemachineBase):
             if self._gameState.changeCards():
                 raise NewGameState(GameStatePlay(self._gameState))
             return err
+        if json.get('event', None) == 'setName':
+            player = json['player']
+            name = json['name']
+            self._gameState.setName(player, name)
+            return
         return self.unexpectedEvent(json)
 
     def appendState(self, json: dict) -> None:
@@ -268,9 +279,10 @@ def test_game():
     'green changeIndex=None cards=10,8,9,ace,jack,queen'
     >>> game.getAssistance()
     'Asterix, Obelix: Bitte eine Karte tauschen!'
+    >>> game.event(dict(player=1, event='setName', name='Karlotto'))
     >>> game.event(dict(player=0, event='changeCard', card=1))
     >>> game.getAssistance()
-    'Obelix: Bitte eine Karte tauschen!'
+    'Karlotto: Bitte eine Karte tauschen!'
     >>> game.event(dict(player=0, event='changeCard', card=2))
     'PlayerState red(Asterix): Expected __cardToBeChangedIndex to be "None" but got "1"'
     >>> dogRandom.seed(0, mockMode=True) # Force the seed for the next player

@@ -102,14 +102,14 @@
         }
       });
 
-      $('#name_button').on('click', function () {
+      $('#button_setName').on('click', function () {
         name_element = $('#textfield_name');
-        click_msg = { name: name_element.val() };
-        DogApp.socket.emit("setname", click_msg);
+        click_msg = { player: 0, event: "setName", name: name_element.val() };
+        DogApp.socket.emit("event", click_msg);
       });
 
       $('#button_newGame').on('click', function () {
-        click_msg = { event: "newGame" };
+        click_msg = { player: 0, event: "newGame" };
         DogApp.socket.emit("event", click_msg);
       });
     });
@@ -169,7 +169,7 @@
             <form>
               <p> I am
                 <input type="text" id="textfield_name" value="D.T." />
-                <button id="name_button">Send</button>
+                <button id="button_setName">Send</button>
               </p>
             </form>
           </td>

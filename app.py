@@ -4,6 +4,8 @@ import eventlet
 import flask
 import flask_socketio
 
+import dog_game
+
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 
@@ -25,14 +27,17 @@ params = dict(
 # socketio = flask_socketio.SocketIO(app, ping_timeout=20, ping_interval=10)
 socketio = flask_socketio.SocketIO(app, **params)
 
+game = dog_game.Game()
+
 @socketio.on('message')
 def handleMessage(msg):
     print(f'Message: {msg}\n')
     socketio.send(f'MESSAGE:{msg}', broadcast=True)
 
-@socketio.on('setname')
-def handleSetname(json):
+@socketio.on('event')
+def handleEvent(json):
     print(f'Json: {json}\n')
+    game.event(json)
 
 @socketio.on('move')
 def handleMove(json):
@@ -80,4 +85,4 @@ def timer_run():
 if __name__ == '__main__':
     # eventlet.spawn(timer_run)
 
-    socketio.run(app)
+    socketio.run(app, host="0.0.0.0")
