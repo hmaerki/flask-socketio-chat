@@ -76,11 +76,7 @@
               var elements = html_element.each(function () {
                 for (var attr_name in attr_set) {
                   attr_value = attr_set[attr_name];
-                  if (attr_value === null) {
-                    this.removeAttribute(attr_name);
-                  } else {
-                    this.setAttribute(attr_name, attr_value);
-                  }
+                  $(this).attr(attr_name, attr_value)
                 };
               });
             }
@@ -103,9 +99,8 @@
         click_msg = { player: 0, event: this.id, card: this.name };
         if (this.id === "setName") {
           // Special case: SetName Button
-          // name_element = $('input#player0_textfield_name');
-          // click_msg['name'] = name_element.val();
-          click_msg['card'] = '2';
+          name_element = $('input#player0_textfield_name');
+          click_msg['name'] = name_element.val();
         }
         else
         {

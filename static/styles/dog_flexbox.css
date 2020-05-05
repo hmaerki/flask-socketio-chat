@@ -14,6 +14,7 @@ button {
   color: black;
   font-weight: bold;
 }
+
 button:disabled {
   color: gray;
   font-weight: unset;

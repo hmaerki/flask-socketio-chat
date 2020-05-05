@@ -61,10 +61,6 @@ class Player:
 
     def disableButtonPlay(self, json: dict, enable=True):
         pass
-    #         "html_id": "#button_play_0",
-    # "attr_set": {
-    #   "disabled": true
-    # }
 
     def disableButtonChange(self, json, enable=True):
         pass
@@ -159,29 +155,23 @@ class PlayerState:
         return enabled
 
     def appendState(self, json: list, statemachineState: 'GameStatemachineBase'):
-        def disable_from_enable(enable):
-            if enabled:
-                # Special Case for Button disabling
-                return None
-            return True
-
         # changeCard-buttons: Enable or disable all
         enabled = statemachineState.buttonChangeEnabled(self)
         json.append({
             'html_id': f'button#player{self.__player.index}_changeCard',
-                'attr_set': { 'disabled': disable_from_enable(enabled) }
+                'attr_set': { 'disabled': not enabled }
         })
 
         for card_index in range(COUNT_PLAYER_CARDS):
             enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonPlayEnabled(self))
             json.append({
                 'html_id': f'button#player{self.__player.index}_playCard[name="{card_index}"]',
-                    'attr_set': { 'disabled': disable_from_enable(enabled) }
+                    'attr_set': { 'disabled': not enabled }
             })
 
         json.append({
             'html_id': f'#player{self.__player.index}_textfield_name',
-                'attr_set': { 'value': self.name+self.name }
+                'attr_set': { 'value': self.name }
         })
 
 class NewGameState(BaseException):
