@@ -14,9 +14,21 @@
     }
   },
   {
-    "html_id": "#button_play_0",
+    "html_id": "button#player0_playCard",
     "attr_set": {
       "disabled": true
+    }
+  },
+  {
+    "html_id": "button#player0_changeCard",
+    "attr_set": {
+      "disabled": null
+    }
+  },
+  {
+    "html_id": "input#player0_textfield_name",
+    "attr_set": {
+      "value": "Asterix"
     }
   }
 ]

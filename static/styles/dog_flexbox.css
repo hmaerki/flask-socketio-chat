@@ -10,6 +10,15 @@ body {
   width: 100%;
 }
 
+button {
+  color: black;
+  font-weight: bold;
+}
+button:disabled {
+  color: gray;
+  font-weight: unset;
+}
+
     .main {
       display: flex;
       height: 100%;

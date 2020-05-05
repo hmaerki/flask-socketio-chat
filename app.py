@@ -5,6 +5,7 @@ import flask
 import flask_socketio
 
 import dog_game
+import dog_html
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
@@ -37,6 +38,20 @@ def handleMessage(msg):
 @socketio.on('event')
 def handleEvent(json):
     print(f'Json: {json}\n')
+
+    for tag in ('player', 'card'):
+        text = json.get(tag, '')
+        if text != '':
+            json[tag] = int(text)
+
+    str_event = json.get('event', None)
+    if str_event is not None:
+        match_event = dog_html.ReEvent.search(str_event)
+        if match_event is not None:
+            # player5_changeCard
+            json['event'] = match_event.event
+            json['player'] = int(match_event.player)
+
     game.event(json)
     json_command = []
     game.appendState(json_command)
@@ -71,19 +86,19 @@ def debugjson():
 
     # curl -X POST http://localhost:5000/debugjson -d @set_all_1.json 
 
-def timer_run():
-    while True:
-        str_time = time.strftime('%H:%M:%S')
-        data_json = {
-            "call_html": {
-                "id": "#time",
-                "calls": {
-                    "html": str_time
-                }
-            }
-        }
-        socketio.send(data_json, json=True, broadcast=True)
-        eventlet.sleep(1.0)
+# def timer_run():
+#     while True:
+#         str_time = time.strftime('%H:%M:%S')
+#         data_json = {
+#             "call_html": {
+#                 "id": "#time",
+#                 "calls": {
+#                     "html": str_time
+#                 }
+#             }
+#         }
+#         socketio.send(data_json, json=True, broadcast=True)
+#         eventlet.sleep(1.0)
 
 if __name__ == '__main__':
     # eventlet.spawn(timer_run)

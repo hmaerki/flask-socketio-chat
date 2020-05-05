@@ -165,21 +165,24 @@ class PlayerState:
                 return None
             return True
 
+        # changeCard-buttons: Enable or disable all
+        enabled = statemachineState.buttonChangeEnabled(self)
+        json.append({
+            'html_id': f'button#player{self.__player.index}_changeCard',
+                'attr_set': { 'disabled': disable_from_enable(enabled) }
+        })
+
         for card_index in range(COUNT_PLAYER_CARDS):
             enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonPlayEnabled(self))
             json.append({
-                "html_id": f"#button_{self.__player.index}_play_{card_index}",
-                    "attr_set": { "disabled": disable_from_enable(enabled) }
+                'html_id': f'button#player{self.__player.index}_playCard[name="{card_index}"]',
+                    'attr_set': { 'disabled': disable_from_enable(enabled) }
             })
 
-            enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonChangeEnabled(self))
-            if not enabled:
-                enabled = None
-            json.append({
-                "html_id": f"#button_{self.__player.index}_change_{card_index}",
-                    "attr_set": { "disabled": disable_from_enable(enabled) }
-            })
-
+        json.append({
+            'html_id': f'#player{self.__player.index}_textfield_name',
+                'attr_set': { 'value': self.name+self.name }
+        })
 
 class NewGameState(BaseException):
     def __init__(self, state):
@@ -363,3 +366,4 @@ def test_game():
     '''
 import doctest
 doctest.testmod()
+# TODO: Throw exception
