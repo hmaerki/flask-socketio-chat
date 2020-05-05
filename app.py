@@ -38,6 +38,9 @@ def handleMessage(msg):
 def handleEvent(json):
     print(f'Json: {json}\n')
     game.event(json)
+    json_command = []
+    game.appendState(json_command)
+    socketio.send(json_command, json=True, broadcast=True)
 
 @socketio.on('move')
 def handleMove(json):

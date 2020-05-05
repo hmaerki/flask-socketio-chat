@@ -8,6 +8,7 @@ import dog_cards
 logging.basicConfig(level=logging.DEBUG)
 
 INITIAL_CARDS_TO_BE_SERVED = 6
+COUNT_PLAYER_CARDS = 6
 COLORS_ID = ('red', 'green', 'blue', 'yellow')
 COLORS_GERMAN = ('Rot', 'Grün', 'Blau', 'Gelb')
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
@@ -43,6 +44,10 @@ class Player:
         return self.__game
 
     @property
+    def index(self) -> int:
+        return self.__index
+
+    @property
     def initialName(self) -> str:
         return INITIAL_NAME[self.__index]
 
@@ -53,6 +58,16 @@ class Player:
     @property
     def colorI18N(self) -> str:
         return COLORS_GERMAN[self.__index]
+
+    def disableButtonPlay(self, json: dict, enable=True):
+        pass
+    #         "html_id": "#button_play_0",
+    # "attr_set": {
+    #   "disabled": true
+    # }
+
+    def disableButtonChange(self, json, enable=True):
+        pass
 
 class Game:
     def __init__(self, player_count=2):
@@ -106,6 +121,10 @@ class PlayerState:
         cards_text = [name(card) for card in self.__cards]
         return f'{self.__player.colorID} changeIndex={self.__cardToBeChangedIndex} cards={",".join(cards_text)}'
 
+    @property
+    def requireToChange(self) -> bool:
+        return self.__cardToBeChangedIndex is None
+
     def setName(self, name:str):
         self.__name = name
 
@@ -126,9 +145,41 @@ class PlayerState:
         self.__cards[self.__cardToBeChangedIndex] = cardOther
         playerStateOther.__cards[playerStateOther.__cardToBeChangedIndex] = cardSelf
 
-    @property
-    def requireToChange(self) -> bool:
-        return self.__cardToBeChangedIndex is None
+    def __getCardAtIndex(self, card_index:int):
+        '''Returns card or "None"'''
+        if card_index >= len(self.__cards):
+            return None
+        return self.__cards[card_index]
+
+    def __enableCardAtIndex(self, card_index:int, enabled:bool):
+        '''Returns "False" if no card, else "enabled"'''
+        card = self.__getCardAtIndex(card_index)
+        if card is None:
+            return False
+        return enabled
+
+    def appendState(self, json: list, statemachineState: 'GameStatemachineBase'):
+        def disable_from_enable(enable):
+            if enabled:
+                # Special Case for Button disabling
+                return None
+            return True
+
+        for card_index in range(COUNT_PLAYER_CARDS):
+            enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonPlayEnabled(self))
+            json.append({
+                "html_id": f"#button_{self.__player.index}_play_{card_index}",
+                    "attr_set": { "disabled": disable_from_enable(enabled) }
+            })
+
+            enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonChangeEnabled(self))
+            if not enabled:
+                enabled = None
+            json.append({
+                "html_id": f"#button_{self.__player.index}_change_{card_index}",
+                    "attr_set": { "disabled": disable_from_enable(enabled) }
+            })
+
 
 class NewGameState(BaseException):
     def __init__(self, state):
@@ -146,6 +197,10 @@ class GameState:
     def game(self) -> Game:
         return self.__game
     
+    @property
+    def playersRequireToChange(self):
+        return [player for player in self.__player_state if player.requireToChange]
+
     def getPlayer(self, index: int) -> 'PlayerState':
         return self.__player_state[index]
 
@@ -161,7 +216,10 @@ class GameState:
             return f'New State "{type(self.__statemachine).__name__}"'
 
     def appendState(self, json: dict) -> None:
-        return self.__statemachine.appendState(json)
+        rc = self.__statemachine.appendState(json)
+        for playerState in self.__player_state:
+            playerState.appendState(json, self.__statemachine)
+        return rc
 
     def getAssistance(self):
         return self.__statemachine.getAssistance()
@@ -180,10 +238,6 @@ class GameState:
             index_B = index_A + player_count_half
             self.__player_state[index_A].changeCard(self.__player_state[index_B])
         return True
-
-    @property
-    def playersRequireToChange(self):
-        return [player for player in self.__player_state if player.requireToChange]
 
 class GameStatemachineBase:
     def __init__(self, gameState: GameState):
@@ -207,6 +261,12 @@ class GameStatemachineBase:
     def getAssistance(self) -> str:
         raise NotImplementedError()
 
+    def buttonPlayEnabled(self, playerState: PlayerState):
+        return False
+
+    def buttonChangeEnabled(self, playerState: PlayerState):
+        return False
+
 class GameStateInit(GameStatemachineBase):
     def event(self, json: dict) -> typing.Optional[str]:
         if json.get('event', None) == 'newGame':
@@ -214,7 +274,7 @@ class GameStateInit(GameStatemachineBase):
         return self.unexpectedEvent(json)
 
     def appendState(self, json: dict) -> None:
-        return
+        pass
 
     def getAssistance(self):
         return f'Spiel starten!'
@@ -247,6 +307,9 @@ class GameStateExchangeCards(GameStatemachineBase):
     def appendState(self, json: dict) -> None:
         return
 
+    def buttonChangeEnabled(self, playerState: PlayerState):
+        return playerState.requireToChange
+
     def getAssistance(self):
         return f'{self.playersRequireToChangeText}: Bitte eine Karte tauschen!'
 
@@ -269,6 +332,9 @@ def test_game():
     '''
     >>> dogRandom.seed(0, mockMode=True)
     >>> game = Game()
+    >>> json_command = []
+    >>> game.appendState(json_command)
+    >>> json_command
     >>> game.getAssistance()
     'Spiel starten!'
     >>> game.event(dict(player=0, event='newGame'))

@@ -10,15 +10,12 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
     integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 
-  <script src="http://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
-    crossorigin="anonymous"></script>
-
-  <!--
-<script
-  src="//code.jquery.com/jquery-3.2.1.slim.min.js"
-  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+  <!-- http://code.jquery.com/jquery/ -->
+  <script
+  src="http://code.jquery.com/jquery-3.5.1.js"
+  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
   crossorigin="anonymous"></script>
--->
+
 </head>
 
 <body>
@@ -102,14 +99,29 @@
         }
       });
 
-      $('#button_setName').on('click', function () {
-        name_element = $('#textfield_name');
-        click_msg = { player: 0, event: "setName", name: name_element.val() };
-        DogApp.socket.emit("event", click_msg);
-      });
+      // $('#button_setName').on('click', function () {
+      //   name_element = $('#textfield_name');
+      //   click_msg = { player: 0, event: "setName", name: name_element.val() };
+      //   DogApp.socket.emit("event", click_msg);
+      // });
 
-      $('#button_newGame').on('click', function () {
-        click_msg = { player: 0, event: "newGame" };
+      // $('#button_newGame').on('click', function () {
+      //   click_msg = { player: 0, event: "newGame" };
+      //   DogApp.socket.emit("event", click_msg);
+      // });
+
+      $(':button').on('click', function () {
+        click_msg = { player: 0, event: this.id, card: this.name };
+        if (this.id === "setName") {
+          // Special case: SetName Button
+          name = $('#textfield_name');
+          click_msg['name'] = name;
+        }
+        else
+        {
+          // The name-attribute is misued to store the card number
+          click_msg['card'] = this.name;
+        }
         DogApp.socket.emit("event", click_msg);
       });
     });
@@ -145,22 +157,27 @@
           <td>2</td>
         </tr>
         <tr>
-          <td><button id="button_play_0">Play</button></td>
-          <td><button id="button_play_1">Play</button></td>
-          <td><button id="button_play_2">Play</button></td>
-          <td><button id="button_play_3">Play</button></td>
-          <td><button id="button_play_4">Play</button></td>
-          <td><button id="button_play_5">Play</button></td>
-        </tr>
+          <id id="button_0_play_group">
+            <td><button id="playCard" name="0">Spielen</button></td>
+            <td><button id="playCard" name="1">Spielen</button></td>
+            <td><button id="playCard" name="2">Spielen</button></td>
+            <td><button id="playCard" name="3">Spielen</button></td>
+            <td><button id="playCard" name="4">Spielen</button></td>
+            <td><button id="playCard" name="5">Spielen</button></td>
+          </id>
+      </tr>
+
         <tr>
-          <td><button id="button_change_0">Change</button></td>
-          <td><button id="button_change_1">Change</button></td>
-          <td><button id="button_change_2">Change</button></td>
-          <td><button id="button_change_3">Change</button></td>
-          <td><button id="button_change_4">Change</button></td>
-          <td><button id="button_change_5">Change</button></td>
-        </tr>
-      </table>
+          <id id="button_0_change_group">
+            <td><button id="changeCard" name="0">Tauschen</button></td>
+            <td><button id="changeCard" name="1">Tauschen</button></td>
+            <td><button id="changeCard" name="2">Tauschen</button></td>
+            <td><button id="changeCard" name="3">Tauschen</button></td>
+            <td><button id="changeCard" name="4">Tauschen</button></td>
+            <td><button id="changeCard" name="5">Tauschen</button></td>
+        </id>
+      </tr>
+    </table>
     </footer>
     <footer style="background: lightgray">
       <table style="width: 95%">
@@ -169,13 +186,13 @@
             <form>
               <p> I am
                 <input type="text" id="textfield_name" value="D.T." />
-                <button id="button_setName">Send</button>
+                <button id="setName">Ok</button>
               </p>
             </form>
           </td>
           <td><button id="button_todo">Undo last move</button></td>
           <td><button id="button_todo">Become next player</button></td>
-          <td><button id="button_newGame">Neues Spiel</button></td>
+          <td><button id="newGame">Neues Spiel</button></td>
         </tr>
       </table>
     </footer>
