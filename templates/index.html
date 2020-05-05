@@ -20,10 +20,6 @@
 
 <body>
 
-<!--
-  <script src="static/js/dog_dispatcher.js"></script>
--->
-
   <div class="example">
 
     <header>
@@ -55,23 +51,23 @@
         </tr>
         <tr>
           <id id="button_0_play_group">
-            <td><button id="player0_playCard" name="0" disabled>Spielen</button></td>
-            <td><button id="player0_playCard" name="1" disabled>Spielen</button></td>
-            <td><button id="player0_playCard" name="2" disabled>Spielen</button></td>
-            <td><button id="player0_playCard" name="3" disabled>Spielen</button></td>
-            <td><button id="player0_playCard" name="4" disabled>Spielen</button></td>
-            <td><button id="player0_playCard" name="5" disabled>Spielen</button></td>
+            <td><button id="player{{ playerIndex }}_playCard" name="0" disabled>Spielen</button></td>
+            <td><button id="player{{ playerIndex }}_playCard" name="1" disabled>Spielen</button></td>
+            <td><button id="player{{ playerIndex }}_playCard" name="2" disabled>Spielen</button></td>
+            <td><button id="player{{ playerIndex }}_playCard" name="3" disabled>Spielen</button></td>
+            <td><button id="player{{ playerIndex }}_playCard" name="4" disabled>Spielen</button></td>
+            <td><button id="player{{ playerIndex }}_playCard" name="5" disabled>Spielen</button></td>
           </id>
       </tr>
 
         <tr>
           <id id="button_0_change_group">
-            <td><button id="player0_changeCard" name="0" disabled>Tauschen</button></td>
-            <td><button id="player0_changeCard" name="1" disabled>Tauschen</button></td>
-            <td><button id="player0_changeCard" name="2" disabled>Tauschen</button></td>
-            <td><button id="player0_changeCard" name="3" disabled>Tauschen</button></td>
-            <td><button id="player0_changeCard" name="4" disabled>Tauschen</button></td>
-            <td><button id="player0_changeCard" name="5" disabled>Tauschen</button></td>
+            <td><button id="player{{ playerIndex }}_changeCard" name="0" disabled>Tauschen</button></td>
+            <td><button id="player{{ playerIndex }}_changeCard" name="1" disabled>Tauschen</button></td>
+            <td><button id="player{{ playerIndex }}_changeCard" name="2" disabled>Tauschen</button></td>
+            <td><button id="player{{ playerIndex }}_changeCard" name="3" disabled>Tauschen</button></td>
+            <td><button id="player{{ playerIndex }}_changeCard" name="4" disabled>Tauschen</button></td>
+            <td><button id="player{{ playerIndex }}_changeCard" name="5" disabled>Tauschen</button></td>
         </id>
       </tr>
     </table>
@@ -82,13 +78,12 @@
           <td>
             <form>
               <p> I am
-                <input type="text" id="player0_textfield_name" value="D. T." />
+                <input type="text" id="player{{ playerIndex }}_textfield_name" value="D. T." />
                 <button id="setName">Ok</button>
               </p>
             </form>
           </td>
-          <td><button id="button_todo">Undo last move</button></td>
-          <td><button id="button_todo">Become next player</button></td>
+          <td><button id="rotateBoard">Spielbrett drehen</button></td>
           <td><button id="newGame">Neues Spiel</button></td>
         </tr>
       </table>
@@ -97,7 +92,7 @@
 
   <script src="static/js/snap.svg.js"></script>
 
-  <script type="module" src="static/js/dog_actions.js"></script>
+  <script type="module" src="/js/dog_actions.js"></script>
 
 </body>
 

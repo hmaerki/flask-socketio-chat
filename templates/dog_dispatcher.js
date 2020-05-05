@@ -8,7 +8,8 @@ $(document).ready(function () {
   DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
 
   DogApp.socket.on('connect', function () {
-    DogApp.socket.send('User has connected!');
+    var msg = { player: {{ playerIndex }}, event: 'browserConnected' };
+    DogApp.socket.emit("event", msg);
   });
 
   DogApp.socket.on('json', function (json) {
@@ -88,6 +89,12 @@ $(document).ready(function () {
       click_msg['card'] = this.name;
     }
     DogApp.socket.emit("event", click_msg);
+
+    if (this.id === "rotateBoard") {
+      // Special case: RotateBoard Button
+      location.replace('{{ rotateUrl }}')
+    }
+
   });
 });
 

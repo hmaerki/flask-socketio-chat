@@ -13,6 +13,30 @@ COLORS_ID = ('red', 'green', 'blue', 'yellow')
 COLORS_GERMAN = ('Rot', 'Grün', 'Blau', 'Gelb')
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
+class JsonWrapper:
+    def __init__(self, json:dict):
+        self.__json = json
+
+    def isEvent(self, eventName: str):
+        return self.__json.get('event', None) == eventName
+
+    def getStr(self, tag, mandatory=True):
+        text = self.__json.get(tag, None)
+        if text is None:
+            if mandatory:
+                raise Exception(f'"{tag}" mssing in: {self.__json}')
+        return text
+
+    def getInt(self, tag, mandatory=True):
+        text = self.getStr(tag=tag, mandatory=mandatory)
+        try:
+            return int(text)
+        except ValueError:
+            raise Exception(f'Expected a integer but got "{tag}" in: {self.__json}')
+
+    def __repr__(self):
+        return repr(self.__json)
+
 class DogRandom:
     def __init__(self):
         self.__mockMode = False
@@ -71,9 +95,9 @@ class Game:
         self.players = [Player(self, index) for index in range(player_count)]
         self.__state = GameState(self)
 
-    def event(self, json: dict) -> typing.Optional[str]:
+    def event(self, json: JsonWrapper) -> typing.Optional[str]:
         try:
-            return self.__state.event(json)
+            return self.__state.event(JsonWrapper(json))
         except NewGameState as ex:
             self.__state = ex.state
 
@@ -201,7 +225,7 @@ class GameState:
         for playerState in self.__player_state:
             playerState.serveCards(self.__cardStack.pop_cards(count_cards))
 
-    def event(self, json: dict) -> typing.Optional[str]:
+    def event(self, json: JsonWrapper) -> typing.Optional[str]:
         try:
             return self.__statemachine.event(json)
         except NewGameState as ex:
@@ -240,8 +264,34 @@ class GameStatemachineBase:
     def game(self):
         return self._gameState.game
 
-    def event(self, json: dict) -> typing.Optional[str]:
+    def event(self, json: JsonWrapper) -> typing.Optional[str]:
         raise NotImplementedError()
+
+    def handleGenericEvent(self, json: JsonWrapper) -> typing.Optional[str]:
+        '''
+        Events which always are valid.
+        return True if event was handled
+        '''
+        if json.isEvent('newGame'):
+            raise NewGameState(GameStateExchangeCards(self._gameState))
+
+        if json.isEvent('setName'):
+            playerIndex = json.getInt('player')
+            playerName = json.getStr('name')
+            self._gameState.setName(playerIndex, playerName)
+            return True
+
+        if json.isEvent('rotateBoard'):
+            playerIndex = json.getInt('player')
+            logging.warning(f'Player {playerIndex} rotated.')
+            return True
+
+        if json.isEvent('browserConnected'):
+            playerIndex = json.getInt('player')
+            logging.warning(f'Player {playerIndex} rotated.')
+            return True
+
+        return False
 
     def unexpectedEvent(self, json: dict) -> None:
         err = f'{type(self).__name__}: Unexpected event:{repr(json)}'
@@ -261,9 +311,9 @@ class GameStatemachineBase:
         return False
 
 class GameStateInit(GameStatemachineBase):
-    def event(self, json: dict) -> typing.Optional[str]:
-        if json.get('event', None) == 'newGame':
-            raise NewGameState(GameStateExchangeCards(self._gameState))
+    def event(self, json: JsonWrapper) -> typing.Optional[str]:
+        if self.handleGenericEvent(json):
+            return
         return self.unexpectedEvent(json)
 
     def appendState(self, json: dict) -> None:
@@ -281,20 +331,17 @@ class GameStateExchangeCards(GameStatemachineBase):
     def playersRequireToChangeText(self):
         return ', '.join(sorted([player.name for player in self._gameState.playersRequireToChange]))
 
-    def event(self, json: dict) -> typing.Optional[str]:
+    def event(self, json: JsonWrapper) -> typing.Optional[str]:
         # dict(player=0, event='changeCard', card=1))
-        if json.get('event', None) == 'changeCard':
-            player = json['player']
-            index = json['card']
-            err = self._gameState.cardToBeChanged(player, index)
+        if self.handleGenericEvent(json):
+            return
+        if json.isEvent('changeCard'):
+            playerIndex = json.getInt('player')
+            cardIndex = json.getInt('card')
+            err = self._gameState.cardToBeChanged(playerIndex, cardIndex)
             if self._gameState.changeCards():
                 raise NewGameState(GameStatePlay(self._gameState))
             return err
-        if json.get('event', None) == 'setName':
-            player = json['player']
-            name = json['name']
-            self._gameState.setName(player, name)
-            return
         return self.unexpectedEvent(json)
 
     def appendState(self, json: dict) -> None:
@@ -312,8 +359,9 @@ class GameStatePlay(GameStatemachineBase):
         self._count_cards_served = INITIAL_CARDS_TO_BE_SERVED
         self._playerToPlayIndex = dogRandom.randint(0, self._gameState.game.player_count-1)
 
-    def event(self, json: dict) -> typing.Optional[str]:
-        pass
+    def event(self, json: JsonWrapper) -> typing.Optional[str]:
+        if self.handleGenericEvent(json):
+            return
 
     def appendState(self, json: dict) -> None:
         return
