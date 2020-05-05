@@ -19,99 +19,11 @@
 </head>
 
 <body>
-  <script type="text/javascript">
-    var DogApp = {
-      DUMMY: 20
-    };
 
-    $(document).ready(function () {
-      DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
+<!--
+  <script src="static/js/dog_dispatcher.js"></script>
+-->
 
-      DogApp.socket.on('connect', function () {
-        DogApp.socket.send('User has connected!');
-      });
-
-      DogApp.socket.on('json', function (json) {
-        console.log('Received "json": ' + JSON.stringify(json));
-        for (var i = 0; i < json.length; i++) { 
-          var command = json[i]
-          var svg_id = command['svg_id']
-          if (svg_id) {
-            var svg_element = $(svg_id);
-            attr_set = command['attr_set']
-            if (attr_set) {
-              var elements = svg_element.each(function () {
-                for (var attr_name in attr_set) {
-                  attr_value = attr_set[attr_name];
-                  this.setAttribute(attr_name, attr_value);
-                };
-              });
-            }
-            transform = command['transform']
-            if (transform) {
-              DogApp.moveCircle(transform)              
-            }
-            continue
-          }
-          html_id = command['html_id']
-          if (html_id) {
-            // Correspnds to:
-            // "call_html": {
-            //     "id": "#time",
-            //     "calls": {
-            //         "html": str_time
-            //     }
-            // }
-            // $("#time").html(str_time);
-            var html_element = $(html_id);
-            html_calls = command['call']
-            if (html_calls) {
-              for (var html_call in html_calls) {
-                html_call_argument = html_calls[html_call];
-                html_element[html_call].call(html_element, html_call_argument)
-              };
-            }
-            attr_set = command['attr_set']
-            if (attr_set) {
-              var elements = html_element.each(function () {
-                for (var attr_name in attr_set) {
-                  attr_value = attr_set[attr_name];
-                  $(this).attr(attr_name, attr_value)
-                };
-              });
-            }
-            continue
-          }
-        };
-      });
-
-      DogApp.socket.on('message', function (msg) {
-        console.log('Received "message": ' + msg);
-        var i = msg.indexOf(':');
-        var method = msg.slice(0, i)
-        var text = msg.slice(i + 1)
-        if (method == 'MESSAGE') {
-          $("#messages").append('<li>' + text + '</li>');
-        }
-      });
-
-      $(':button').on('click', function () {
-        click_msg = { player: 0, event: this.id, card: this.name };
-        if (this.id === "setName") {
-          // Special case: SetName Button
-          name_element = $('input#player0_textfield_name');
-          click_msg['name'] = name_element.val();
-        }
-        else
-        {
-          // The name-attribute is misued to store the card number
-          click_msg['card'] = this.name;
-        }
-        DogApp.socket.emit("event", click_msg);
-      });
-    });
-
-  </script>
   <div class="example">
 
     <header>
@@ -185,84 +97,7 @@
 
   <script src="static/js/snap.svg.js"></script>
 
-  <script type="text/javascript">
-    // First lets create our drawing surface out of existing SVG element
-    // If you want to create new surface just provide dimensions
-    // like s = Snap(800, 600);
-    // var s = Snap("#svg");
-    var s = Snap("#svg");
-    // var s = Snap();
-    // Lets create big circle in the middle:
-    var circleColorChange = s.circle(10, 10, 20);
-    circleColorChange.attr({
-      class: "colorchange"
-    });
-
-    var circleA = s.circle(150, 150, 100);
-    // By default its black, lets change its attributes
-    circleA.attr({
-      fill: "#bada55",
-      stroke: "#000",
-      strokeWidth: 5,
-      class: "draggable"
-    });
-
-    // Now lets create another small circle:
-    var circleB = s.circle(100, 150, 70);
-    // Lets put this small circle and another one into a group:
-    var discs = s.group(circleB, s.circle(200, 150, 70));
-    // Now we can change attributes for the whole group
-    discs.attr({
-      fill: "#fff"
-    });
-
-    var board = s.image("static/img/20030731_181107_dog_4.jpg");
-    board.attr({
-      x: 10,
-      y: 300,
-      class: "draggable"
-    })
-
-    // Despite our small circle now is a part of a group
-    // and a part of a mask we could still access it:
-    circleB.animate({ r: 50 }, 1000);
-    // We don’t have reference for second small circle,
-    // but we could easily grab it with CSS selectors:
-    discs.select("circle:nth-child(2)").animate({ r: 50 }, 1000);
-
-    // DogApp.moveCircle = function(dx, dy) {
-    DogApp.moveCircle = function (transform) {
-      // transform = circleA.transform().local + (circleA.transform().local ? "T" : "t") + [dx, dy]
-      console.log("transform: " + transform)
-      circleColorChange.attr({
-        transform: transform
-      });
-      board.animate({ transform: transform}, 100)
-      // board.attr({
-      //   transform: transform
-      // });
-    }
-
-    var move = function (dx, dy) {
-      transform = this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
-      this.attr({
-        transform: transform
-      });
-      // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
-      move_msg = { id: this.id, transform: transform }
-      DogApp.socket.emit("move", move_msg);
-    }
-
-    var start = function () {
-      this.data('origTransform', this.transform().local);
-      DogApp.move_last_s = 0.0
-    }
-    var stop = function () {
-      console.log('finished dragging');
-    }
-    circleA.drag(move, start, stop)
-    board.drag()
-  </script>
+  <script type="module" src="static/js/dog_actions.js"></script>
 
 </body>
 
