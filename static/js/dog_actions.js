@@ -54,12 +54,12 @@ DogApp.moveCircle = function (transform) {
 }
 
 var move = function (dx, dy) {
-  transform = this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
+  var transform = this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
   this.attr({
     transform: transform
   });
   // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
-  move_msg = { id: this.id, transform: transform }
+  var move_msg = { id: this.id, transform: transform }
   DogApp.socket.emit("move", move_msg);
 }
 

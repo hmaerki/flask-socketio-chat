@@ -27,7 +27,7 @@ $(document).ready(function () {
             };
           });
         }
-        transform = command['transform']
+        var transform = command['transform']
         if (transform) {
           DogApp.moveCircle(transform)              
         }
