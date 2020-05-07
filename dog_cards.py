@@ -28,11 +28,11 @@ class Card:
 
     @property
     def nameI18N(self) -> str:
-        return self.__dict_card['name']
+        return self.__dict_card['german']['name']
 
     @property
     def descriptionI18N(self) -> str:
-        return self.__dict_card['description']
+        return self.__dict_card['german']['description']
 
 class Cards:
     @classmethod

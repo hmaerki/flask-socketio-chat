@@ -60,7 +60,7 @@ class PlayerState:
             return err
         self.__cardToBeChangedIndex = index
     
-    def changeCard(self, playerStateOther: 'PlayerState'):
+    def changeCard(self, playerStateOther: PlayerState):
         cardSelf = self.__cards[self.__cardToBeChangedIndex]
         cardOther = playerStateOther.__cards[playerStateOther.__cardToBeChangedIndex]
 
@@ -80,24 +80,34 @@ class PlayerState:
             return False
         return enabled
 
-    def appendState(self, json: list, statemachineState: 'GameStatemachineBase'):
+    def appendState(self, json: list, statemachineState: GameStatemachineBase):
         # changeCard-buttons: Enable or disable all
         enabled = statemachineState.buttonChangeEnabled(self)
         json.append({
             'html_id': f'button#player{self.__player.index}_changeCard',
-                'attr_set': { 'disabled': not enabled }
+            'attr_set': { 'disabled': not enabled }
         })
 
+        # Update the play cards buttons
         for card_index in range(dog_constants.COUNT_PLAYER_CARDS):
             enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonPlayEnabled(self))
             json.append({
                 'html_id': f'button#player{self.__player.index}_playCard[name="{card_index}"]',
-                    'attr_set': { 'disabled': not enabled }
+                'attr_set': { 'disabled': not enabled }
+            })
+
+        # Update the cards
+        for card_index in range(dog_constants.COUNT_PLAYER_CARDS):
+            card = self.__getCardAtIndex(card_index)
+            card_name = '-' if card is None else card.nameI18N
+            json.append({
+                'html_id': f'p#player{self.__player.index}_card[name="{card_index}"]',
+                'html': card_name
             })
 
         json.append({
             'html_id': f'#player{self.__player.index}_textfield_name',
-                'attr_set': { 'value': self.name }
+            'attr_set': { 'value': self.name }
         })
 
 class GameState:

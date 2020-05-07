@@ -56,6 +56,12 @@ $(document).ready(function () {
             };
           });
         }
+        var attr_set = command['html']
+        if (attr_set) {
+          var elements = html_element.each(function () {
+            $(this).html(attr_set)
+          });
+        }
         continue
       }
     };
