@@ -1,12 +1,6 @@
-import { DogApp } from './dog_app.js'
-
-// export var DogApp = {
-//   playerIndex: 42,
-//   rotateUrl: 'undefined'
-// };
 
 $(document).ready(function () {
-  DogApp.socket = DogApp.io.connect('http://' + document.domain + ':' + location.port);
+  DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
 
   DogApp.socket.on('connect', function () {
     var msg = { player: DogApp.playerIndex, event: 'browserConnected' };

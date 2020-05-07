@@ -1,4 +1,3 @@
-import { DogApp } from './dog_app.js'
 
 // First lets create our drawing surface out of existing SVG element
 // If you want to create new surface just provide dimensions

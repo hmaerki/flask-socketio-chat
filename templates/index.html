@@ -18,12 +18,13 @@
 </head>
 
 <body>
-  <script type="module" src="static/js/dog_app.js"></script>
-  <script type="javascript">
-    setPlayer({{ playerIndex }}, "{{ rotateUrl }}");
-    setIo(io);
+  <script type="text/javascript">
+    var DogApp = {
+      playerIndex: {{ playerIndex }},
+      rotateUrl: "{{ rotateUrl }}"
+    };
   </script>
-  <script type="module" src="static/js/dog_dispatcher.js"></script>
+  <script src="static/js/dog_dispatcher.js"></script>
 
   <div class="example">
     <header>
@@ -96,7 +97,7 @@
 
   <script src="static/js/snap.svg.js"></script>
 
-  <script type="module" src="static/js/dog_actions.js"></script>
+  <script src="static/js/dog_actions.js"></script>
 
 </body>
 
