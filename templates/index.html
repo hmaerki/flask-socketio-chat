@@ -15,13 +15,17 @@
   src="http://code.jquery.com/jquery-3.5.1.js"
   integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
   crossorigin="anonymous"></script>
-
 </head>
 
 <body>
+  <script type="module" src="static/js/dog_app.js"></script>
+  <script type="javascript">
+    setPlayer({{ playerIndex }}, "{{ rotateUrl }}");
+    setIo(io);
+  </script>
+  <script type="module" src="static/js/dog_dispatcher.js"></script>
 
   <div class="example">
-
     <header>
       <ul id="messages"></ul>
       <p id="time">The time</p>
@@ -92,7 +96,7 @@
 
   <script src="static/js/snap.svg.js"></script>
 
-  <script type="module" src="/js/dog_actions.js"></script>
+  <script type="module" src="static/js/dog_actions.js"></script>
 
 </body>
 

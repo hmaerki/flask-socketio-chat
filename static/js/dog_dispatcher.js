@@ -1,15 +1,16 @@
+import { DogApp } from './dog_app.js'
 
-
-export var DogApp = {
-  DUMMY: 20
-};
+// export var DogApp = {
+//   playerIndex: 42,
+//   rotateUrl: 'undefined'
+// };
 
 $(document).ready(function () {
-  DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
+  DogApp.socket = DogApp.io.connect('http://' + document.domain + ':' + location.port);
 
   DogApp.socket.on('connect', function () {
-    var msg = { player: {{ playerIndex }}, event: 'browserConnected' };
-    DogApp.socket.emit("event", msg);
+    var msg = { player: DogApp.playerIndex, event: 'browserConnected' };
+    DogApp.socket.emit('event', msg);
   });
 
   DogApp.socket.on('json', function (json) {
@@ -37,13 +38,13 @@ $(document).ready(function () {
       var html_id = command['html_id']
       if (html_id) {
         // Correspnds to:
-        // "call_html": {
-        //     "id": "#time",
-        //     "calls": {
-        //         "html": str_time
+        // 'call_html': {
+        //     'id': '#time',
+        //     'calls': {
+        //         'html': str_time
         //     }
         // }
-        // $("#time").html(str_time);
+        // $('#time').html(str_time);
         var html_element = $(html_id);
         var html_calls = command['call']
         if (html_calls) {
@@ -72,13 +73,13 @@ $(document).ready(function () {
     var method = msg.slice(0, i)
     var text = msg.slice(i + 1)
     if (method == 'MESSAGE') {
-      $("#messages").append('<li>' + text + '</li>');
+      $('#messages').append('<li>' + text + '</li>');
     }
   });
 
   $(':button').on('click', function () {
-    var click_msg = { player: 0, event: this.id, card: this.name };
-    if (this.id === "setName") {
+    var click_msg = { player: DogApp.playerIndex, event: this.id, card: this.name };
+    if (this.id === 'setName') {
       // Special case: SetName Button
       name_element = $('input#player0_textfield_name');
       click_msg['name'] = name_element.val();
@@ -88,11 +89,11 @@ $(document).ready(function () {
       // The name-attribute is misued to store the card number
       click_msg['card'] = this.name;
     }
-    DogApp.socket.emit("event", click_msg);
+    DogApp.socket.emit('event', click_msg);
 
-    if (this.id === "rotateBoard") {
+    if (this.id === 'rotateBoard') {
       // Special case: RotateBoard Button
-      location.replace('{{ rotateUrl }}')
+      location.replace(DogApp.rotateUrl)
     }
 
   });

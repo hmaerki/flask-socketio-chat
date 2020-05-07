@@ -40,9 +40,13 @@ def handleEvent(json):
     print(f'Json: {json}\n')
 
     for tag in ('player', 'card'):
-        text = json.get(tag, '')
-        if text != '':
-            json[tag] = int(text)
+        text = json.get(tag, None)
+        if text is None:
+            continue
+        if text == '':
+            del json[tag]
+            continue
+        json[tag] = int(text)
 
     str_event = json.get('event', None)
     if str_event is not None:
@@ -69,9 +73,24 @@ def handleMove(json):
     ]
     socketio.send(json_command, json=True, broadcast=True)
 
+def index_inner(playerIndex:int):
+    playerIndexNext = (playerIndex+1)%game.player_count
+    rotateUrl = f'{flask.request.url_root}{playerIndexNext}'
+    return flask.render_template('index.html', playerIndex=playerIndex, rotateUrl=rotateUrl)
+
 @app.route('/')
 def index():
-    return flask.render_template('index.html')
+    return index_inner(0)
+
+# @app.route('/<int:player>')
+@app.route('/<int:playerIndex>')
+def index_player(playerIndex):
+    return index_inner(playerIndex)
+
+@app.route('/favicon.ico')
+def favicon():
+    return "<html></html>"
+
 
 # https://riptutorial.com/flask/example/5832/receiving-json-from-an-http-request
 @app.route('/debugjson', methods=['POST', 'GET']) 
