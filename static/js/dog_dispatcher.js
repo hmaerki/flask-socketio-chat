@@ -8,7 +8,7 @@ $(document).ready(function () {
   });
 
   DogApp.socket.on('json', function (json) {
-    console.log('Received "json": ' + JSON.stringify(json));
+    // console.log('Received "json": ' + JSON.stringify(json));
     for (var i = 0; i < json.length; i++) { 
       var command = json[i]
       var svg_id = command['svg_id']
@@ -81,7 +81,7 @@ $(document).ready(function () {
     var click_msg = { player: DogApp.playerIndex, event: this.id, card: this.name };
     if (this.id === 'setName') {
       // Special case: SetName Button
-      name_element = $('input#player0_textfield_name');
+      name_element = $(`input#player${DogApp.playerIndex}_textfield_name`);
       click_msg['name'] = name_element.val();
     }
     else

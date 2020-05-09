@@ -12,6 +12,36 @@ import dog_game_statemachine
 
 import dog_cards
 
+
+class JsonWrapper:
+    def __init__(self, gameState: GameState, json:dict):
+        self.__gameState = gameState
+        self.__json = json
+
+    def isEvent(self, eventName: str):
+        return self.__json.get('event', None) == eventName
+
+    def getStr(self, tag, mandatory=True):
+        text = self.__json.get(tag, None)
+        if text is None:
+            if mandatory:
+                raise Exception(f'"{tag}" mssing in: {self.__json}')
+        return text
+
+    def getInt(self, tag, mandatory=True):
+        text = self.getStr(tag=tag, mandatory=mandatory)
+        try:
+            return int(text)
+        except ValueError:
+            raise Exception(f'Expected a integer but got "{tag}" in: {self.__json}')
+
+    def addMessage(self, msg:str) -> None:
+        playerIndex = self.getInt('player')
+        self.__gameState.addMessage(playerIndex, msg)
+
+    def __repr__(self):
+        return repr(self.__json)
+
 class PlayerState:
     def __init__(self, player: dog_game.Player):
         self.__player = player
@@ -117,6 +147,7 @@ class GameState:
         self.__player_state = [PlayerState(player) for player in self.__game.players]
         self.__cardStack = dog_cards.Cards()
         self.__cardStack.shuffle(dog_constants.dogRandom.shuffle)
+        self.__messages = []
 
     @property
     def game(self) -> dog_game.Game:
@@ -126,6 +157,13 @@ class GameState:
     def playersRequireToChange(self):
         return [player for player in self.__player_state if player.requireToChange]
 
+    def addMessage(self, playerIndex: int, msg:str) -> None:
+        player = self.__player_state[playerIndex].name
+        msg2 = f'{player}: {msg}'
+        self.__messages.insert(0, msg2)
+        while len(self.__messages) > 5:
+            self.__messages.pop(-1)
+
     def getPlayer(self, index: int) -> 'PlayerState':
         return self.__player_state[index]
 
@@ -133,9 +171,9 @@ class GameState:
         for playerState in self.__player_state:
             playerState.serveCards(self.__cardStack.pop_cards(count_cards))
 
-    def event(self, json: dog_game.JsonWrapper) -> typing.Optional[str]:
+    def event(self, json: str) -> typing.Optional[str]:
         try:
-            return self.__statemachine.event(json)
+            return self.__statemachine.event(JsonWrapper(self, json))
         except dog_game_statemachine.NewGameStateException as ex:
             self.__statemachine = ex.state
             return f'New State "{type(self.__statemachine).__name__}"'
@@ -144,6 +182,17 @@ class GameState:
         rc = self.__statemachine.appendState(json)
         for playerState in self.__player_state:
             playerState.appendState(json, self.__statemachine)
+
+        json.append({
+            'html_id': '#assistance',
+            'html': self.game.getAssistance()
+        })
+
+        json.append({
+            'html_id': '#messages',
+            'html': ' / '.join(self.__messages)
+        })
+
         return rc
 
     def getAssistance(self):

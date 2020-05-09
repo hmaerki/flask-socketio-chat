@@ -1,4 +1,5 @@
-import time
+
+import logging
 
 import eventlet
 import flask
@@ -17,10 +18,10 @@ https://medium.com/hackervalleystudio/weekend-project-part-2-turning-flask-into-
 https://medium.com/hackervalleystudio/weekend-project-part-3-centralizing-state-management-with-vuex-5f4387ebc144
 '''
 params = dict(
-	# ping_timeout=1000,
-	# ping_interval=5000,
+    # ping_timeout=1000,
+    # ping_interval=5000,
     cors_allowed_origins='*',
-    logger=True,
+    logger=False,
     engineio_logger=False,
     async_mode='eventlet'
     # async_mode='threading'
@@ -56,10 +57,14 @@ def handleEvent(json):
             json['event'] = match_event.event
             json['player'] = int(match_event.player)
 
-    game.event(json)
-    json_command = []
-    game.appendState(json_command)
-    socketio.send(json_command, json=True, broadcast=True)
+    try:
+        game.event(json)
+        json_command = []
+        game.appendState(json_command)
+        socketio.send(json_command, json=True, broadcast=True)
+    except Exception as e:
+        logging.error(f'******************* Error during game.event(): {e}')
+        raise
 
 @socketio.on('move')
 def handleMove(json):
@@ -82,7 +87,6 @@ def index_inner(playerIndex:int):
 def index():
     return index_inner(0)
 
-# @app.route('/<int:player>')
 @app.route('/<int:playerIndex>')
 def index_player(playerIndex):
     return index_inner(playerIndex)

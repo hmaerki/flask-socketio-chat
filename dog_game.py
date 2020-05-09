@@ -15,30 +15,6 @@ COLORS_ID = ('red', 'green', 'blue', 'yellow')
 COLORS_GERMAN = ('Rot', 'Grün', 'Blau', 'Gelb')
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
-class JsonWrapper:
-    def __init__(self, json:dict):
-        self.__json = json
-
-    def isEvent(self, eventName: str):
-        return self.__json.get('event', None) == eventName
-
-    def getStr(self, tag, mandatory=True):
-        text = self.__json.get(tag, None)
-        if text is None:
-            if mandatory:
-                raise Exception(f'"{tag}" mssing in: {self.__json}')
-        return text
-
-    def getInt(self, tag, mandatory=True):
-        text = self.getStr(tag=tag, mandatory=mandatory)
-        try:
-            return int(text)
-        except ValueError:
-            raise Exception(f'Expected a integer but got "{tag}" in: {self.__json}')
-
-    def __repr__(self):
-        return repr(self.__json)
-
 class Player:
     def __init__(self, game: 'Game', index: int):
         self.__index = index
@@ -74,22 +50,19 @@ class Game:
     def __init__(self, player_count=2):
         self.player_count = player_count
         self.players = [Player(self, index) for index in range(player_count)]
-        self.__state = dog_game_state.GameState(self)
+        self.__gameState = dog_game_state.GameState(self)
 
-    def event(self, json: JsonWrapper) -> typing.Optional[str]:
-        try:
-            return self.__state.event(JsonWrapper(json))
-        except dog_game_statemachine.NewGameStateException as ex:
-            self.__state = ex.state
+    def event(self, json: str) -> typing.Optional[str]:
+        return self.__gameState.event(json)
 
     def appendState(self, json: dict) -> None:
-        return self.__state.appendState(json)
+        return self.__gameState.appendState(json)
 
     def getAssistance(self):
-        return self.__state.getAssistance()
+        return self.__gameState.getAssistance()
 
     def getPlayer(self, index: int) -> 'PlayerState':
-        return self.__state.getPlayer(index)
+        return self.__gameState.getPlayer(index)
 
 def test_game():
     '''

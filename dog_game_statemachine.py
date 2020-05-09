@@ -33,22 +33,26 @@ class GameStatemachineBase:
         return True if event was handled
         '''
         if json.isEvent('newGame'):
+            json.addMessage('Neues Spiel')
             raise NewGameStateException(GameStateExchangeCards(self._gameState))
 
         if json.isEvent('setName'):
             playerIndex = json.getInt('player')
             playerName = json.getStr('name')
             self._gameState.setName(playerIndex, playerName)
+            json.addMessage(f'Heisst neu "{playerName}"')
             return True
 
         if json.isEvent('rotateBoard'):
             playerIndex = json.getInt('player')
             logging.warning(f'Player {playerIndex} rotated.')
+            json.addMessage('Spielbrett drehen')
             return True
 
         if json.isEvent('browserConnected'):
             playerIndex = json.getInt('player')
-            logging.warning(f'Player {playerIndex} rotated.')
+            logging.warning(f'****************************************** {playerIndex} verbunden.')
+            # json.addMessage('Verbunden')
             return True
 
         return False
@@ -98,6 +102,7 @@ class GameStateExchangeCards(GameStatemachineBase):
         if json.isEvent('changeCard'):
             playerIndex = json.getInt('player')
             cardIndex = json.getInt('card')
+            json.addMessage('Tauschen')
             err = self._gameState.cardToBeChanged(playerIndex, cardIndex)
             if self._gameState.changeCards():
                 raise NewGameStateException(GameStatePlay(self._gameState))

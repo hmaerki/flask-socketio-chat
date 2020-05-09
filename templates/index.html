@@ -26,11 +26,10 @@
   </script>
   <script src="static/js/dog_dispatcher.js"></script>
 
-  <div class="example">
+  <div class="frame">
     <header>
-      <ul id="messages"></ul>
-      <p id="time">The time</p>
-      <!-- <div class="example"> -->
+      <p id="assistance">Spiel starten...</p>
+      <p id="messages">...</p>
     </header>
     <main class="main">
       <div class="content">
@@ -42,10 +41,6 @@
     </main>
     <footer>
       <table style="width: 95%">
-        <tr>
-          <td colspan="6" style="font-size: 0.5em; text-align: left;">Donald played King /
-            Donald presses "Become next player" / Carla played 3</td>
-        </tr>
         <tr>
           <td><p id="player{{ playerIndex }}_card" name="0">...</p></td>
           <td><p id="player{{ playerIndex }}_card" name="1">...</p></td>
@@ -77,14 +72,14 @@
       </tr>
     </table>
     </footer>
-    <footer style="background: lightgray">
+    <footer>
       <table style="width: 95%">
         <tr>
           <td>
             <form>
-              <p> I am
+              <p>
                 <input type="text" id="player{{ playerIndex }}_textfield_name" value="D. T." />
-                <button id="setName">Ok</button>
+                <button id="setName">Name setzen</button>
               </p>
             </form>
           </td>
