@@ -12,6 +12,13 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Python: Game Doctest",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/dog_game.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

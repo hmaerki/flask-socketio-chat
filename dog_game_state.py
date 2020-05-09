@@ -43,7 +43,8 @@ class JsonWrapper:
         return repr(self.__json)
 
 class PlayerState:
-    def __init__(self, player: dog_game.Player):
+    def __init__(self, game_state:GameState, player: dog_game.Player):
+        self.__game_state = game_state
         self.__player = player
         self.__name = player.initialName
         self.__cards = ()
@@ -65,6 +66,10 @@ class PlayerState:
         return self.__name
 
     @property
+    def player(self) -> dog_game.Player:
+        return self.__player
+
+    @property
     def cardsText(self) -> str:
         def name(card):
             if card is None:
@@ -83,12 +88,12 @@ class PlayerState:
     def serveCards(self, cards: list) -> None:
         self.__cards = cards
 
-    def cardToBeChanged(self, index:int) -> typing.Optional[str]:
+    def cardToBeChanged(self, card_index:int) -> typing.Optional[str]:
         err = f'{self}: Expected __cardToBeChangedIndex to be "None" but got "{self.__cardToBeChangedIndex}"'
         if self.__cardToBeChangedIndex is not None:
             logging.warning(err)
             return err
-        self.__cardToBeChangedIndex = index
+        self.__cardToBeChangedIndex = card_index
     
     def changeCard(self, playerStateOther: PlayerState):
         cardSelf = self.__cards[self.__cardToBeChangedIndex]
@@ -96,6 +101,13 @@ class PlayerState:
 
         self.__cards[self.__cardToBeChangedIndex] = cardOther
         playerStateOther.__cards[playerStateOther.__cardToBeChangedIndex] = cardSelf
+
+    def playCard(self, card_index: int, f_addMessage:typing.Callable):
+        card = self.__getCardAtIndex(card_index)
+        f_addMessage(f'spielt {card.nameI18N}')
+        self.__game_state.throwCardInCenter(card)
+        self.__cards[card_index] = None
+
 
     def __getCardAtIndex(self, card_index:int):
         '''Returns card or "None"'''
@@ -110,7 +122,7 @@ class PlayerState:
             return False
         return enabled
 
-    def appendState(self, json: list, statemachineState: GameStatemachineBase):
+    def appendState(self, json: list, statemachineState: dog_game_statemachine.GameStatemachineBase):
         # changeCard-buttons: Enable or disable all
         enabled = statemachineState.buttonChangeEnabled(self)
         json.append({
@@ -144,10 +156,12 @@ class GameState:
     def __init__(self, game: dog_game.Game):
         self.__game = game
         self.__statemachine = dog_game_statemachine.GameStateInit(self)
-        self.__player_state = [PlayerState(player) for player in self.__game.players]
+        self.__player_state = [PlayerState(self, player) for player in self.__game.players]
         self.__cardStack = dog_cards.Cards()
         self.__cardStack.shuffle(dog_constants.dogRandom.shuffle)
+        self.__cardInCenter = None
         self.__messages = []
+        self.__last_message = '-'
 
     @property
     def game(self) -> dog_game.Game:
@@ -157,9 +171,14 @@ class GameState:
     def playersRequireToChange(self):
         return [player for player in self.__player_state if player.requireToChange]
 
+    @property
+    def lastMessage(self):
+        return self.__last_message
+
     def addMessage(self, playerIndex: int, msg:str) -> None:
         player = self.__player_state[playerIndex].name
-        msg2 = f'{player}: {msg}'
+        msg2 = f'{player} {msg}'
+        self.__last_message = msg2
         self.__messages.insert(0, msg2)
         while len(self.__messages) > 5:
             self.__messages.pop(-1)
@@ -179,7 +198,6 @@ class GameState:
             return f'New State "{type(self.__statemachine).__name__}"'
 
     def appendState(self, json: dict) -> None:
-        rc = self.__statemachine.appendState(json)
         for playerState in self.__player_state:
             playerState.appendState(json, self.__statemachine)
 
@@ -193,7 +211,13 @@ class GameState:
             'html': ' / '.join(self.__messages)
         })
 
-        return rc
+        cardInCentre = ''
+        if self.__cardInCenter is not None:
+            cardInCentre = self.__cardInCenter.nameI18N
+        json.append({
+            'html_id': '#card_in_center',
+            'html': cardInCentre
+        })
 
     def getAssistance(self):
         return self.__statemachine.getAssistance()
@@ -204,6 +228,9 @@ class GameState:
     def cardToBeChanged(self, player:int, index:int):
         return self.__player_state[player].cardToBeChanged(index)
 
+    def playCard(self, player:int, index:int, f_addMessage:typing.Callable):
+        return self.__player_state[player].playCard(index, f_addMessage)
+
     def changeCards(self):
         if len(self.playersRequireToChange) > 0:
             return False
@@ -212,3 +239,7 @@ class GameState:
             index_B = index_A + player_count_half
             self.__player_state[index_A].changeCard(self.__player_state[index_B])
         return True
+
+    # def throwCardInCenter(self, card:dog_cards.Card) -> None:
+    def throwCardInCenter(self, card):
+        self.__cardInCenter = card

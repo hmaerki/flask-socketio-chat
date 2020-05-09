@@ -52,11 +52,15 @@ class Game:
         self.players = [Player(self, index) for index in range(player_count)]
         self.__gameState = dog_game_state.GameState(self)
 
+    @property
+    def lastMessage(self):
+        return self.__gameState.lastMessage
+
     def event(self, json: str) -> typing.Optional[str]:
         return self.__gameState.event(json)
 
     def appendState(self, json: dict) -> None:
-        return self.__gameState.appendState(json)
+        self.__gameState.appendState(json)
 
     def getAssistance(self):
         return self.__gameState.getAssistance()
@@ -91,11 +95,17 @@ def test_game():
     >>> game.event(dict(player=1, event='changeCard', card=5))
     'New State "GameStatePlay"'
     >>> game.getAssistance()
-    'Asterix bitte Karte ausspielen!'
+    'Asterix: Bitte Karte ausspielen!'
     >>> game.getPlayer(0).cardsText
     'red changeIndex=1 cards=2,queen,4,5,6,7'
     >>> game.getPlayer(1).cardsText
     'green changeIndex=5 cards=10,8,9,ace,jack,3'
+    >>> game.event(dict(player=1, event='playCard', card=5))
+    >>> game.lastMessage
+    'Karlotto darf jetzt nicht spielen!'
+    >>> game.event(dict(player=0, event='playCard', card=5))
+    >>> game.lastMessage
+    'Asterix spielt 7'
     '''
 import doctest
 doctest.testmod()
