@@ -37,32 +37,17 @@
       // preserveAspectRatio: "xMidYMid meet"
     });
 
-    var DogApp = {
-      mouseX: 0,
-      mouseY: 0
-    };
-
-    groupBoard = snap.g()
-
-    var lineDiag = groupBoard.line(-90, -90, 90, 90)
+    var lineDiag = snap.line(-90, -90, 90, 90)
     lineDiag.attr({
       stroke: "#000",
       strokeWidth: 5,
       cursor: "move"
     })
 
-    var circleDrag = groupBoard.circle(10, 10, 20);
+    var circleDrag = snap.circle(10, 10, 20);
     circleDrag.attr({
       class: "draggable",
       background: "#0f0",
-      cursor: "move"
-    });
-
-
-    var circleDragSnap = groupBoard.circle(50, 10, 20);
-    circleDrag.attr({
-      class: "draggable",
-      background: "#00f",
       cursor: "move"
     });
 
@@ -119,61 +104,24 @@
         }
       }
 
-      // 'r0,0,0' -> groupBoard-matrix: 1, 0, 0, 1, 0, 0
-      // 'r90,0,0' -> groupBoard-matrix: 0, 1, -1, 0, 0, 0
-      // 'r180,0,0' -> groupBoard-matrix: -1, 0, 0, -1, 0, 0
-      // 'r270,0,0' -> groupBoard-matrix: 0, -1, 1, 0, 0, 0
-      // groupBoard.animate({ transform: 'r90,0,0' }, 1000, mina.bounce );
-      groupBoard.transform('r90,0,0');
-
     /*
-    */
-    var move = function(dx,dy,mouseX,mouseY) {
-        // this.attr({
-        //   transform: origTransform + (origTransform ? "T" : "t") + [dx, dy]
-        // });
-
-        // m = this.node.transform.animVal[0].matrix
-        // m = this.node.transform.baseVal[0].matrix
-        // console.log('this.node.transform.baseVal[0].matrix.: ' + m.a + ', ' + m.b + ', ' + m.c + ', ' + m.d + ', ' + m.e + ', ' + m.f)
-        m = groupBoard.node.transform.baseVal[0].matrix
-        console.log('groupBoard.node.transform.baseVal[0].matrix.: ' + m.a + ', ' + m.b + ', ' + m.c + ', ' + m.d + ', ' + m.e + ', ' + m.f)
-
-        dx2 = + m.a*dx - m.c*dy
-        dy2 = - m.b*dx + m.d*dy
-
-        m = snap.transform().globalMatrix
-        factor = m.a
-        dx2 /= factor
-        dy2 /= factor
-
+    var move = function(dx,dy,mousex,mousey) {
         this.attr({
-            cx: DogApp.start_cx + dx2,
-            cy: DogApp.start_cy + dy2
-        });
-        // this.attr({
-        //   // transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx2, dy2]
-        //   transform: "t" + [dx2, dy2]
-        // });
-      }
+                    transform: origTransform + (origTransform ? "T" : "t") + [dx, dy]
+                });
+    }
 
 
     var start = function(mouseX, mouseY) {
-      this.data('origTransform', this.transform().local );
-
-      DogApp.start_cx = this.node.cx.baseVal.value;
-      DogApp.start_cy = this.node.cy.baseVal.value;
-      console.log('this.transform().local: ' + this.transform().local)
-      m = this.transform().localMatrix
-      console.log('start.matrix.: ' + m.a + ', ' + m.b + ', ' + m.c + ', ' + m.d + ', ' + m.e + ', ' + m.f)
+      origTransform = this.transform().local;
     }
     var stop = function() {
       console.log('finished dragging');
     }
 
 
-    circleDragSnap.drag(move, start, stop)
-
+    circleDrag.drag(move, start, stop)
+    */
   </script>
 
 </body>

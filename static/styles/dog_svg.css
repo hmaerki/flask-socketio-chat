@@ -13,8 +13,8 @@ pre.code {
   cursor:  move;
 }
 
-.colorchange {
-  background: #888;
+#svg g .colorchange {
+  fill: #FF0000;
 }
 
 #codelines {
