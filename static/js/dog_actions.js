@@ -1,3 +1,9 @@
+// http://snapsvg.io/docs/
+// http://snapsvg.io/demos/
+// http://snapsvg.io/start/
+// http://svg.dabbles.info/snaptut-responsive
+// https://wiki.selfhtml.org/wiki/SVG/Tutorials/Einstieg/SVG_in_responsiven_Webseiten
+// https://css-tricks.com/scale-svg/
 
 // First lets create our drawing surface out of existing SVG element
 // If you want to create new surface just provide dimensions
@@ -11,9 +17,9 @@ circleColorChange.attr({
   class: "colorchange"
 });
 
-var circleA = s.circle(150, 150, 100);
+var circleDraggableGreen = s.circle(150, 150, 100);
 // By default its black, lets change its attributes
-circleA.attr({
+circleDraggableGreen.attr({
   fill: "#bada55",
   stroke: "#000",
   strokeWidth: 5,
@@ -29,10 +35,12 @@ discs.attr({
   fill: "#fff"
 });
 
-var board = s.image("static/img/20030731_181107_dog_4.jpg");
+var board = s.image("static/img/20030731_181107_dog_4.jpg", 10, 10, 200, 200);
 board.attr({
-  x: 10,
-  y: 300,
+  // x: 10,
+  // y: 10,
+  // width: 200,
+  // height: 200,
   class: "draggable"
 })
 
@@ -44,7 +52,7 @@ circleB.animate({ r: 50 }, 1000);
 discs.select("circle:nth-child(2)").animate({ r: 50 }, 1000);
 
 DogApp.moveCircle = function (transform) {
-  // transform = circleA.transform().local + (circleA.transform().local ? "T" : "t") + [dx, dy]
+  // transform = circleDraggableGreen.transform().local + (circleDraggableGreen.transform().local ? "T" : "t") + [dx, dy]
   console.log("transform: " + transform)
   circleColorChange.attr({
     transform: transform
@@ -52,6 +60,10 @@ DogApp.moveCircle = function (transform) {
   board.animate({ transform: transform}, 100)
 }
 
+
+//
+// Moving the cicle will emit messages to the server
+//
 var move = function (dx, dy) {
   var transform = this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
   this.attr({
@@ -69,5 +81,5 @@ var start = function () {
 var stop = function () {
   console.log('finished dragging');
 }
-circleA.drag(move, start, stop)
-board.drag()
+circleDraggableGreen.drag(move, start, stop)
+//board.drag()

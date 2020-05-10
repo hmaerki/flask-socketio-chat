@@ -8,15 +8,19 @@ pre.code {
   background: #181818;
   border: solid 2px #181818;
 }
+
 .draggable {
-cursor: move;
+  cursor:  move;
 }
+
 .colorchange {
-background: #888;
+  background: #888;
 }
+
 #codelines {
   display: none;
 }
+
 #svg {
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -24,6 +28,7 @@ background: #888;
   border: solid 2px #ccc;
   width: 95%;
   height: 95%;
+  viewBox="0 0 200 200"
   margin-top: 10px;
   margin-left: 10px;
   margin-right: 10px;
