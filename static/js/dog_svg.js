@@ -7,17 +7,28 @@
 
 // First lets create our drawing surface out of existing SVG element
 // If you want to create new surface just provide dimensions
-// like s = Snap(800, 600);
-// var s = Snap("#svg");
-var s = Snap("#svg");
-// var s = Snap();
+// like snap = Snap(800, 600);
+// var snap = Snap("#svg");
+var snap = Snap("#svg");
+// snap.attr({ viewBox: "0 0 200 200" });
+
+// var snap = Snap();
 // Lets create big circle in the middle:
-var circleColorChange = s.circle(10, 10, 20);
+var circleColorChange = snap.circle(10, 10, 20);
 circleColorChange.attr({
   class: "colorchange"
 });
 
-var circleDraggableGreen = s.circle(150, 150, 100);
+var rectBorder = snap.rect(-50, -50, 100, 100, 10, 10)
+rectBorder.attr({
+  // fill: "#888",
+  fill: "#f00",
+  stroke: "#000",
+  strokeWidth: 1,
+  opacity: 0.5,
+})
+
+var circleDraggableGreen = snap.circle(0, 0, 50);
 // By default its black, lets change its attributes
 circleDraggableGreen.attr({
   fill: "#bada55",
@@ -26,16 +37,7 @@ circleDraggableGreen.attr({
   class: "draggable"
 });
 
-// Now lets create another small circle:
-var circleB = s.circle(100, 150, 70);
-// Lets put this small circle and another one into a group:
-var discs = s.group(circleB, s.circle(200, 150, 70));
-// Now we can change attributes for the whole group
-discs.attr({
-  fill: "#fff"
-});
-
-var board = s.image("static/img/20030731_181107_dog_4.jpg", 10, 10, 200, 200);
+var board = snap.image("static/img/20030731_181107_dog_4.jpg", 10, 10, 100, 100);
 board.attr({
   // x: 10,
   // y: 10,
@@ -43,13 +45,6 @@ board.attr({
   // height: 200,
   class: "draggable"
 })
-
-// Despite our small circle now is a part of a group
-// and a part of a mask we could still access it:
-circleB.animate({ r: 50 }, 1000);
-// We don’t have reference for second small circle,
-// but we could easily grab it with CSS selectors:
-discs.select("circle:nth-child(2)").animate({ r: 50 }, 1000);
 
 DogApp.moveCircle = function (transform) {
   // transform = circleDraggableGreen.transform().local + (circleDraggableGreen.transform().local ? "T" : "t") + [dx, dy]
