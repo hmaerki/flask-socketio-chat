@@ -10,7 +10,32 @@
 // like snap = Snap(800, 600);
 // var snap = Snap("#svg");
 var snap = Snap("#svg");
-// snap.attr({ viewBox: "0 0 200 200" });
+snap.attr({ viewBox: "-100 -100 200 200" });
+
+  groupBoard = snap.g()
+
+  var lineTopdiag = groupBoard.line(-90, -90, 90, 90)
+  lineTopdiag.attr({
+    stroke: "#000",
+    strokeWidth: 5
+  })
+
+
+  var board = groupBoard.image("static/img/20030731_181107_dog_4.jpg", -90, -90, 180, 180);
+  board.attr({
+  // x: 10,
+  // y: 10,
+  // width: 200,
+  // height: 200,
+  opacity: 0.2,
+  class: "draggable"
+  })
+
+  groupBoard.animate({ transform: 'r90,0,0' }, 1000, mina.bounce );
+
+
+
+
 
 // var snap = Snap();
 // Lets create big circle in the middle:
@@ -36,15 +61,6 @@ circleDraggableGreen.attr({
   strokeWidth: 5,
   class: "draggable"
 });
-
-var board = snap.image("static/img/20030731_181107_dog_4.jpg", 10, 10, 100, 100);
-board.attr({
-  // x: 10,
-  // y: 10,
-  // width: 200,
-  // height: 200,
-  class: "draggable"
-})
 
 DogApp.moveCircle = function (transform) {
   // transform = circleDraggableGreen.transform().local + (circleDraggableGreen.transform().local ? "T" : "t") + [dx, dy]

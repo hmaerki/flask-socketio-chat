@@ -5,7 +5,7 @@
   <title>Online Dog</title>
 
   <link rel="stylesheet" href="static/styles/dog_svg.css" type="text/css" media="screen" />
-  <link rel="stylesheet" href="static/styles/dog_flexbox.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="static/styles/dog_html.css" type="text/css" media="screen" />
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
     integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
@@ -26,74 +26,67 @@
   </script>
   <script src="static/js/dog_dispatcher.js"></script>
 
-  <div class="frame">
-    <header>
+  <div style="height: 10vh; background-color: red;">
       <p id="assistance">Spiel starten...</p>
       <p id="messages">...</p>
-    </header>
-    <main class="main">
-      <div class="content">
-        <!-- https://www.w3chools.com/graphics/svg_examples.asp -->
-        <!-- https://svgjs.com/docs/3.0/ -->
-        <!-- <id id="svg" height="180" width="500"/> -->
-        <!--  <svg id="svg" viewBox="0 0 200 200" preserveAspectRatio="slice"></svg> -->
-        <!-- <svg id="svg" width="100%", height="100vh"></svg> -->
-        <svg id="svg"></svg>
-        <!--
-          <svg id="svg">
-            <svg id="svg_snap" viewBox="-100 -100 100 100"></svg>
-          </svg>
-        -->
-      </div>
-    </main>
-    <footer>
-      <p id="card_in_center">...</p>
-      <table style="width: 95%">
-        <tr>
-          <td><p id="player{{ playerIndex }}_card" name="0">...</p></td>
-          <td><p id="player{{ playerIndex }}_card" name="1">...</p></td>
-          <td><p id="player{{ playerIndex }}_card" name="2">...</p></td>
-          <td><p id="player{{ playerIndex }}_card" name="3">...</p></td>
-          <td><p id="player{{ playerIndex }}_card" name="4">...</p></td>
-          <td><p id="player{{ playerIndex }}_card" name="5">...</p></td>
-        </tr>
-        <tr>
-          <td><button id="player{{ playerIndex }}_playCard" name="0" disabled>Spielen</button></td>
-          <td><button id="player{{ playerIndex }}_playCard" name="1" disabled>Spielen</button></td>
-          <td><button id="player{{ playerIndex }}_playCard" name="2" disabled>Spielen</button></td>
-          <td><button id="player{{ playerIndex }}_playCard" name="3" disabled>Spielen</button></td>
-          <td><button id="player{{ playerIndex }}_playCard" name="4" disabled>Spielen</button></td>
-          <td><button id="player{{ playerIndex }}_playCard" name="5" disabled>Spielen</button></td>
+  </div>
+  <div style="height: 70vh; background-color: green;">
+      <!-- https://www.w3chools.com/graphics/svg_examples.asp -->
+      <!-- https://svgjs.com/docs/3.0/ -->
+      <!-- <id id="svg" height="180" width="500"/> -->
+      <!--  <svg id="svg" viewBox="0 0 200 200" preserveAspectRatio="slice"></svg> -->
+      <!-- <svg id="svg" width="100%", height="100vh"></svg> -->
+      <svg id="svg" width="100%" height="70vh"></svg>
+      <!--
+        <svg id="svg">
+          <svg id="svg_snap" viewBox="-100 -100 100 100"></svg>
+        </svg>
+      -->
+  </div>
+  <div style="height: 18vh; background-color: blue;">
+    <p id="card_in_center">...</p>
+    <table style="width: 95%">
+      <tr>
+        <td><p id="player{{ playerIndex }}_card" name="0">...</p></td>
+        <td><p id="player{{ playerIndex }}_card" name="1">...</p></td>
+        <td><p id="player{{ playerIndex }}_card" name="2">...</p></td>
+        <td><p id="player{{ playerIndex }}_card" name="3">...</p></td>
+        <td><p id="player{{ playerIndex }}_card" name="4">...</p></td>
+        <td><p id="player{{ playerIndex }}_card" name="5">...</p></td>
+      </tr>
+      <tr>
+        <td><button id="player{{ playerIndex }}_playCard" name="0" disabled>Spielen</button></td>
+        <td><button id="player{{ playerIndex }}_playCard" name="1" disabled>Spielen</button></td>
+        <td><button id="player{{ playerIndex }}_playCard" name="2" disabled>Spielen</button></td>
+        <td><button id="player{{ playerIndex }}_playCard" name="3" disabled>Spielen</button></td>
+        <td><button id="player{{ playerIndex }}_playCard" name="4" disabled>Spielen</button></td>
+        <td><button id="player{{ playerIndex }}_playCard" name="5" disabled>Spielen</button></td>
       </tr>
 
-        <tr>
-          <td><button id="player{{ playerIndex }}_changeCard" name="0" disabled>Tauschen</button></td>
-          <td><button id="player{{ playerIndex }}_changeCard" name="1" disabled>Tauschen</button></td>
-          <td><button id="player{{ playerIndex }}_changeCard" name="2" disabled>Tauschen</button></td>
-          <td><button id="player{{ playerIndex }}_changeCard" name="3" disabled>Tauschen</button></td>
-          <td><button id="player{{ playerIndex }}_changeCard" name="4" disabled>Tauschen</button></td>
-          <td><button id="player{{ playerIndex }}_changeCard" name="5" disabled>Tauschen</button></td>
+      <tr>
+        <td><button id="player{{ playerIndex }}_changeCard" name="0" disabled>Tauschen</button></td>
+        <td><button id="player{{ playerIndex }}_changeCard" name="1" disabled>Tauschen</button></td>
+        <td><button id="player{{ playerIndex }}_changeCard" name="2" disabled>Tauschen</button></td>
+        <td><button id="player{{ playerIndex }}_changeCard" name="3" disabled>Tauschen</button></td>
+        <td><button id="player{{ playerIndex }}_changeCard" name="4" disabled>Tauschen</button></td>
+        <td><button id="player{{ playerIndex }}_changeCard" name="5" disabled>Tauschen</button></td>
       </tr>
     </table>
-    </footer>
-    <footer>
-      <table style="width: 95%">
-        <tr>
-          <td>
-            <form>
-              <p>
-                <input type="text" id="player{{ playerIndex }}_textfield_name" value="D. T." />
-                <button id="setName">Name setzen</button>
-              </p>
-            </form>
-          </td>
-          <td><button id="rotateBoard">Spielbrett drehen</button></td>
-          <td><button id="newGame">Neues Spiel</button></td>
-        </tr>
-      </table>
-    </footer>
+    <table style="width: 95%">
+      <tr>
+        <td>
+          <form>
+            <p>
+              <input type="text" id="player{{ playerIndex }}_textfield_name" value="D. T." />
+              <button id="setName">Name setzen</button>
+            </p>
+          </form>
+        </td>
+        <td><button id="rotateBoard">Spielbrett drehen</button></td>
+        <td><button id="newGame">Neues Spiel</button></td>
+      </tr>
+    </table>
   </div>
-
   <script src="static/js/snap.svg.js"></script>
 
   <script src="static/js/dog_svg.js"></script>

@@ -36,33 +36,3 @@ p#messages {
   overflow: hidden;
   text-overflow: ellipsis
 }
-
-.main {
-  display: flex;
-  height: 100%;
-  font-size: 2rem;
-  /*justify-content: space-between;*/
-  justify-content: space-around;
-}
-
-.frame {
-  width: 100%;
-  height: 100vh;
-  /*max-width: 1200px;*/
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  background: lightgrey;
-}
-
-header, footer {
-  width: 100%;
-  text-align: center;
-  font-size: 2.0em;
-}
-
-.content {
-  width: 100%;
-  padding: 1em;
-  background: lightslategrey;
-}
