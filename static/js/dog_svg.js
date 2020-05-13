@@ -65,7 +65,10 @@ var move = function (dx, dy, mouseX, mouseY) {
   // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
   // var move_msg = { id: this.node.id, cx: cx|0, cy: cy|0 }
   // var move_msg = { id: this.node.id, x: cx|0, y: cy|0 }
-  var move_msg = [this.node.id, DogApp.playerIndex, cx|0, cy|0]
+  var move_msg = {
+    'svg_id': '#' + this.node.id,
+    'marble': [cx|0, cy|0]
+  }
   DogApp.socket.emit("marble", move_msg);
 }
 
@@ -80,15 +83,8 @@ var stop = function () {
   console.log('finished dragging');
 }
 
-for (c=0; c<2; c++) {
-  for (i=0; i<2; i++) {
-    // var circleMarble = groupBoard.circle(0, 0, 3);
-    // circleMarble.attr({
-    //   class: "marble_"+c,
-    //   stroke: "#888",
-    //   strokeWidth: 1,
-    //   // strokeOpacity: 0.5,
-    // });
+for (c=0; c<DogApp.playerCount; c++) {
+  for (i=0; i<4; i++) {
     var circleMarble = groupBoard.image("static/img/color_" + c + ".png", 0, 0, 10, 10);
     circleMarble.attr({
       class: "marble_"+c,

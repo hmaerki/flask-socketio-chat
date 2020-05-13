@@ -67,20 +67,10 @@ def handleEvent(json):
         raise
 
 @socketio.on('marble')
-def handleMove(json):
+def handleMove(json: dict):
     print(f'Json: {json}\n')
-    # svg_id, playerIndex, x, y = json[0], json[1], json[2], json[3]
-    # json_command = [
-    #     {
-    #         "svg_id": "#" + svg_id,
-    #         "attr_set": {
-    #             "x":  x,
-    #             "y":  y
-    #         }
-    #     },
-    # ]
-    # socketio.send(json, json=True, broadcast=True)
-    socketio.emit('marble', data=json)
+    game.setMarble(json)
+    socketio.send([json], json=True, broadcast=True)
 
 
 def index_inner(playerIndex:int):

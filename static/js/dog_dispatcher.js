@@ -7,18 +7,6 @@ $(document).ready(function () {
     DogApp.socket.emit('event', msg);
   });
 
-  DogApp.socket.on('marble', function (json) {
-    svg_id = '#' + json[0]
-    player = json[1]
-    x = json[2]
-    y = json[3]
-    var svg_element = $(svg_id);
-    svg_element.each(function () {
-      this.setAttribute('x', x);
-      this.setAttribute('y', y);
-    });
-  });
-
   DogApp.socket.on('json', function (json) {
       // console.log('Received "json": ' + JSON.stringify(json));
     for (var i = 0; i < json.length; i++) { 
@@ -33,6 +21,15 @@ $(document).ready(function () {
               attr_value = attr_set[attr_name];
               this.setAttribute(attr_name, attr_value);
             };
+          });
+        }
+        marble = command['marble']
+        if (marble) {
+          x = marble[0]
+          y = marble[1]
+          svg_element.each(function () {
+            this.setAttribute('x', x);
+            this.setAttribute('y', y);
           });
         }
         continue
@@ -72,6 +69,7 @@ $(document).ready(function () {
         }
         continue
       }
+      console.log('Unknown command: ' + command);
     };
   });
 

@@ -152,6 +152,7 @@ class PlayerState:
             'attr_set': { 'value': self.name }
         })
 
+
 class GameState:
     def __init__(self, game: dog_game.Game):
         self.__game = game
@@ -162,6 +163,7 @@ class GameState:
         self.__cardInCenter = None
         self.__messages = []
         self.__last_message = '-'
+        self.__dictMarbles = {}
 
     @property
     def game(self) -> dog_game.Game:
@@ -219,11 +221,19 @@ class GameState:
             'html': cardInCentre
         })
 
+        for dictPosition in self.__dictMarbles.values():
+            json.append(dictPosition)
+
     def getAssistance(self):
         return self.__statemachine.getAssistance()
 
     def setName(self, player:int, name:str):
         return self.__player_state[player].setName(name)
+
+    def setMarble(self, dictPosition: dict) -> None:
+        # ['circle1_0', 0, 0, 0]
+        svg_id = dictPosition['svg_id']
+        self.__dictMarbles[svg_id] = dictPosition
 
     def cardToBeChanged(self, player:int, index:int):
         return self.__player_state[player].cardToBeChanged(index)

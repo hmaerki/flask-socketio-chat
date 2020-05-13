@@ -67,6 +67,10 @@ class Game:
 
     def getPlayer(self, index: int) -> 'PlayerState':
         return self.__gameState.getPlayer(index)
+    
+    def setMarble(self, dictPosition: dict) -> None:
+        self.__gameState.setMarble(dictPosition)
+
 
 def test_game():
     '''
