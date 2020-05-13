@@ -66,25 +66,32 @@ def handleEvent(json):
         logging.error(f'******************* Error during game.event(): {e}')
         raise
 
-@socketio.on('move')
+@socketio.on('marble')
 def handleMove(json):
     print(f'Json: {json}\n')
-    # socketio.send(dict(dx=json['dx'], dy=json['dy']), json=True)
-    json_command = [
-        {
-            "svg_id": "#" + json['id'],
-            "attr_set": {
-                "cx":  json['cx'],
-                "cy":  json['cy']
-            }
-        },
-    ]
-    socketio.send(json_command, json=True, broadcast=True)
+    # svg_id, playerIndex, x, y = json[0], json[1], json[2], json[3]
+    # json_command = [
+    #     {
+    #         "svg_id": "#" + svg_id,
+    #         "attr_set": {
+    #             "x":  x,
+    #             "y":  y
+    #         }
+    #     },
+    # ]
+    # socketio.send(json, json=True, broadcast=True)
+    socketio.emit('marble', data=json)
+
 
 def index_inner(playerIndex:int):
     playerIndexNext = (playerIndex+1)%game.player_count
     rotateUrl = f'{flask.request.url_root}{playerIndexNext}'
-    return flask.render_template('index.html', playerIndex=playerIndex, rotateUrl=rotateUrl)
+    params = dict(
+        playerCount = game.player_count,
+        playerIndex = playerIndex,
+        rotateUrl = rotateUrl
+    )
+    return flask.render_template('index.html', **params)
 
 @app.route('/')
 def index():

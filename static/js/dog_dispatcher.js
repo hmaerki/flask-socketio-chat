@@ -7,8 +7,20 @@ $(document).ready(function () {
     DogApp.socket.emit('event', msg);
   });
 
+  DogApp.socket.on('marble', function (json) {
+    svg_id = '#' + json[0]
+    player = json[1]
+    x = json[2]
+    y = json[3]
+    var svg_element = $(svg_id);
+    svg_element.each(function () {
+      this.setAttribute('x', x);
+      this.setAttribute('y', y);
+    });
+  });
+
   DogApp.socket.on('json', function (json) {
-    // console.log('Received "json": ' + JSON.stringify(json));
+      // console.log('Received "json": ' + JSON.stringify(json));
     for (var i = 0; i < json.length; i++) { 
       var command = json[i]
       var svg_id = command['svg_id']
@@ -16,7 +28,7 @@ $(document).ready(function () {
         var svg_element = $(svg_id);
         attr_set = command['attr_set']
         if (attr_set) {
-          var elements = svg_element.each(function () {
+          svg_element.each(function () {
             for (var attr_name in attr_set) {
               attr_value = attr_set[attr_name];
               this.setAttribute(attr_name, attr_value);
@@ -45,7 +57,7 @@ $(document).ready(function () {
         }
         var attr_set = command['attr_set']
         if (attr_set) {
-          var elements = html_element.each(function () {
+          html_element.each(function () {
             for (var attr_name in attr_set) {
               var attr_value = attr_set[attr_name];
               $(this).attr(attr_name, attr_value)
@@ -54,7 +66,7 @@ $(document).ready(function () {
         }
         var attr_set = command['html']
         if (attr_set) {
-          var elements = html_element.each(function () {
+          html_element.each(function () {
             $(this).html(attr_set)
           });
         }

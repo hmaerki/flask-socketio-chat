@@ -20,7 +20,7 @@ pre.code {
 }
 
 .board {
-  opacity: 0.5;
+  opacity: none;
 }
 
 #codelines {

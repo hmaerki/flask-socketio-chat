@@ -21,7 +21,7 @@ lineTopdiag.attr({
 })
 
 
-var board = groupBoard.image("static/img/20030731_181107_dog_4.jpg", -90, -90, 180, 180);
+var board = groupBoard.image("static/img/board.png", -100, -100, 200, 200);
 board.attr({
   // x: 10,
   // y: 10,
@@ -30,7 +30,9 @@ board.attr({
   class: "board"
 })
 
-groupBoard.animate({ transform: 'r90,0,0' }, 2000, mina.bounce );
+var angle = DogApp.playerIndex * 360 / DogApp.playerCount
+// groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
+groupBoard.attr({transform: 'r' + angle + ',0,0'});
 
 // var rectBorder = groupBoard.rect(-50, -50, 100, 100, 10, 10)
 // rectBorder.attr({
@@ -61,13 +63,17 @@ var move = function (dx, dy, mouseX, mouseY) {
   // this.attr({ cx: cx, cy: cy });
 
   // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
-  var move_msg = { id: this.node.id, cx: cx|0, cy: cy|0 }
-  DogApp.socket.emit("move", move_msg);
+  // var move_msg = { id: this.node.id, cx: cx|0, cy: cy|0 }
+  // var move_msg = { id: this.node.id, x: cx|0, y: cy|0 }
+  var move_msg = [this.node.id, DogApp.playerIndex, cx|0, cy|0]
+  DogApp.socket.emit("marble", move_msg);
 }
 
 var start = function () {
-  DogApp.start_cx = this.node.cx.baseVal.value;
-  DogApp.start_cy = this.node.cy.baseVal.value;
+  // DogApp.start_cx = this.node.cx.baseVal.value;
+  // DogApp.start_cy = this.node.cy.baseVal.value;
+  DogApp.start_cx = this.node.x.baseVal.value;
+  DogApp.start_cy = this.node.y.baseVal.value;
 }
 
 var stop = function () {
@@ -76,13 +82,16 @@ var stop = function () {
 
 for (c=0; c<2; c++) {
   for (i=0; i<2; i++) {
-    var circleMarble = groupBoard.circle(0, 0, 3);
-    // By default its black, lets change its attributes
+    // var circleMarble = groupBoard.circle(0, 0, 3);
+    // circleMarble.attr({
+    //   class: "marble_"+c,
+    //   stroke: "#888",
+    //   strokeWidth: 1,
+    //   // strokeOpacity: 0.5,
+    // });
+    var circleMarble = groupBoard.image("static/img/color_" + c + ".png", 0, 0, 10, 10);
     circleMarble.attr({
       class: "marble_"+c,
-      stroke: "#888",
-      strokeWidth: 1,
-      // strokeOpacity: 0.5,
     });
     circleMarble.node.id="circle"+c+'_'+i
     circleMarble.drag(move, start, stop)
