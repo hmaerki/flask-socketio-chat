@@ -9,8 +9,14 @@ pre.code {
   border: solid 2px #181818;
 }
 
-.draggable {
+.marble_0 {
   cursor:  move;
+  fill: #FF0000;
+}
+
+.marble_1 {
+  cursor:  move;
+  fill: #FFFF00
 }
 
 #svg g .colorchange {

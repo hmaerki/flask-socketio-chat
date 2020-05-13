@@ -43,16 +43,7 @@ rectBorder.attr({
   opacity: 0.5,
 })
 
-var circleDraggableGreen = groupBoard.circle(0, 0, 50);
-// By default its black, lets change its attributes
-circleDraggableGreen.attr({
-  fill: "#bada55",
-  stroke: "#000",
-  strokeWidth: 5,
-  class: "draggable"
-});
 
-// DogApp.moveCircle = function (transform) {
 //   // transform = circleDraggableGreen.transform().local + (circleDraggableGreen.transform().local ? "T" : "t") + [dx, dy]
 //   console.log("transform: " + transform)
 //   circleColorChange.attr({
@@ -60,12 +51,6 @@ circleDraggableGreen.attr({
 //   });
 //   board.animate({ transform: transform}, 100)
 // }
-
-var circleColorChange = groupBoard.circle(50, 0, 20);
-circleColorChange.attr({
-  class: "colorchange"
-});
-
 
 //
 // Moving the cicle will emit messages to the server
@@ -87,7 +72,7 @@ var move = function (dx, dy, mouseX, mouseY) {
   this.attr({ cx: cx, cy: cy });
 
   // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
-  var move_msg = { id: this.id, cx: cx|0, cy: cy|0 }
+  var move_msg = { id: this.node.id, cx: cx|0, cy: cy|0 }
   DogApp.socket.emit("move", move_msg);
 }
 
@@ -99,4 +84,25 @@ var start = function () {
 var stop = function () {
   console.log('finished dragging');
 }
-circleDraggableGreen.drag(move, start, stop)
+
+for (c=0; c<2; c++) {
+  for (i=0; i<2; i++) {
+    var circleDraggableGreen = groupBoard.circle(0, 0, 50);
+    // By default its black, lets change its attributes
+    circleDraggableGreen.attr({
+      // fill: "#bada55",
+      stroke: "#000",
+      strokeWidth: 2,
+      class: "marble_"+c,
+    });
+    circleDraggableGreen.node.id="circle"+c+'_'+i
+    circleDraggableGreen.drag(move, start, stop)
+  }
+}
+
+var circleColorChange = groupBoard.circle(50, 0, 20);
+circleColorChange.attr({
+  class: "colorchange"
+});
+
+
