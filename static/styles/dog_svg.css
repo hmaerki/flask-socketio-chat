@@ -16,11 +16,11 @@ pre.code {
 
 .marble_1 {
   cursor:  move;
-  fill: #FFFF00
+  fill: #FFFF00;
 }
 
-#svg g .colorchange {
-  fill: #FF0000;
+.board {
+  opacity: 0.5;
 }
 
 #codelines {

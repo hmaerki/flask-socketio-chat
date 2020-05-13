@@ -72,7 +72,7 @@ def handleMove(json):
     # socketio.send(dict(dx=json['dx'], dy=json['dy']), json=True)
     json_command = [
         {
-            "svg_id": "#svg g .colorchange",
+            "svg_id": "#" + json['id'],
             "attr_set": {
                 "cx":  json['cx'],
                 "cy":  json['cy']

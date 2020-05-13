@@ -23,10 +23,6 @@ $(document).ready(function () {
             };
           });
         }
-        var transform = command['transform']
-        if (transform) {
-          DogApp.moveCircle(transform)              
-        }
         continue
       }
       var html_id = command['html_id']
