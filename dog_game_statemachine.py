@@ -39,8 +39,8 @@ class GameStatemachineBase:
         if json.isEvent('setName'):
             playerIndex = json.getInt('player')
             playerName = json.getStr('name')
-            self._gameState.setName(playerIndex, playerName)
             json.addMessage(f'heisst neu {playerName}')
+            self._gameState.setName(playerIndex, playerName)
             return True
 
         if json.isEvent('rotateBoard'):
