@@ -14,11 +14,11 @@ snap.attr({ viewBox: "-100 -100 200 200" });
 
 groupBoard = snap.g()
 
-var lineTopdiag = groupBoard.line(-90, -90, 90, 90)
-lineTopdiag.attr({
-  stroke: "#000",
-  strokeWidth: 1
-})
+// var lineTopdiag = groupBoard.line(-90, -90, 90, 90)
+// lineTopdiag.attr({
+//   stroke: "#000",
+//   strokeWidth: 1
+// })
 
 
 var board = groupBoard.image("static/img/board.png", -100, -100, 200, 200);
