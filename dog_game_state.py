@@ -35,9 +35,12 @@ class JsonWrapper:
         except ValueError:
             raise Exception(f'Expected a integer but got "{tag}" in: {self.__json}')
 
-    def addMessage(self, msg:str, msgI18L:str) -> None:
+    def addMessagePlayer(self, msg:str, msgI18L:str) -> None:
         playerIndex = self.getInt('player')
-        self.__gameState.addMessage(playerIndex, msg, msgI18L)
+        self.__gameState.addMessagePlayer(playerIndex, msg, msgI18L)
+
+    def addMessage(self, msg:str, msgI18L:str) -> None:
+        self.__gameState.addMessage(msg, msgI18L)
 
     def __repr__(self):
         return repr(self.__json)
@@ -105,18 +108,18 @@ class PlayerState:
     def playCard(self, json: JsonWrapper, card_index: int, f_addMessage:typing.Callable):
         card = self.__getCardAtIndex(card_index)
         if card is None:
-            json.addMessage(msg=': This card is not available', msgI18L=': Diese Karte kannst Du nicht spielen.')
+            json.addMessagePlayer(msg=': This card is not available', msgI18L=': Diese Karte kannst Du nicht spielen.')
             return 'Card already played'
         f_addMessage(msg=f'plays {card.id}', msgI18L=f'spielt {card.nameI18N}')
         self.__game_state.throwCardInCenter(card)
         self.__cards[card_index] = None
-        self.__game_state.cardPlayedSuccessfully(lastCard=self.__lastCard())
+        self.__game_state.cardPlayedSuccessfully(json, lastCard=self.__lastCard())
 
     def __lastCard(self):
         for card in self.__cards:
             if card is not None:
-                return True
-        return False
+                return False
+        return True
 
     def __getCardAtIndex(self, card_index:int):
         '''Returns card or "None"'''
@@ -168,11 +171,23 @@ class GameState:
         self.__statemachine = dog_game_statemachine.GameStateInit(self)
         self.__list_player_state = [PlayerState(self, player) for player in self.__game.players]
         self.__cardStack = dog_cards.Cards()
-        self.__cardStack.shuffle(dog_constants.dogRandom.shuffle)
         self.__cardInCenter = None
         self.__messagesI18L = []
         self.__last_message = '-'
         self.__dictMarbles = {}
+
+    def shuffleCards(self, json: JsonWrapper):
+        # It is not possible to play one game (6,5,4,3,2) with one card set. 120 cards are available but 120 required.
+        #   Total cards: 13*4*2 + 3*2 = 110
+        #   Cards used in one round: 6 Players, cards 6, 5, 4, 3, 2
+        #   6 * (6+5+4+3+2) = 120
+        MAX_PLAYERS = 6
+        MAX_CARDS_PER_PLAYER = 6
+        if self.__cardStack.count > MAX_PLAYERS*MAX_CARDS_PER_PLAYER:
+            # Shuffling still not required
+            return
+        self.__cardStack.shuffle(dog_constants.dogRandom.shuffle)
+        json.addMessage(msg='shuffle card', msgI18L='Die Karten wurden gemischt')
 
     @property
     def game(self) -> dog_game.Game:
@@ -186,11 +201,15 @@ class GameState:
     def lastMessage(self):
         return self.__last_message
 
-    def addMessage(self, playerIndex: int, msg:str, msgI18L:str) -> None:
+    def addMessagePlayer(self, playerIndex: int, msg:str, msgI18L:str) -> None:
         player = self.__list_player_state[playerIndex].name
-        msg2I18L = f'{player} {msgI18L}'
-        self.__last_message = f'{player} {msg}'
-        self.__messagesI18L.insert(0, msg2I18L)
+        _msg = f'{player} {msg}'
+        _msgI18L = f'{player} {msgI18L}'
+        self.addMessage(_msg, _msgI18L)
+
+    def addMessage(self, msg:str, msgI18L:str) -> None:
+        self.__last_message = msg
+        self.__messagesI18L.insert(0, msgI18L)
         while len(self.__messagesI18L) > 5:
             self.__messagesI18L.pop(-1)
 
@@ -259,8 +278,8 @@ class GameState:
             self.__list_player_state[index_A].changeCard(self.__list_player_state[index_B])
         return True
 
-    def cardPlayedSuccessfully(self, lastCard: bool) -> None:
-        self.__statemachine.cardPlayedSuccessfully(lastCard)
+    def cardPlayedSuccessfully(self, json: JsonWrapper, lastCard: bool) -> None:
+        self.__statemachine.cardPlayedSuccessfully(json, lastCard)
 
     # def throwCardInCenter(self, card:dog_cards.Card) -> None:
     def throwCardInCenter(self, card):

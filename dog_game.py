@@ -127,10 +127,26 @@ def test_game():
     >>> game.getPlayer(1).cardsText
     'green changeIndex=2 cards=5,-,-'
     >>> game.event(dict(player=1, event='playCard', card=0))
+
+    # New cards have been distributed!
+    >>> game.lastMessage
+    'Karlotto Distribute 2 cards'
     >>> game.getPlayer(0).cardsText
-    'red changeIndex=1 cards=-,-,-'
+    'red changeIndex=1 cards=8,9'
     >>> game.getPlayer(1).cardsText
-    'green changeIndex=2 cards=-,-,-'
+    'green changeIndex=2 cards=10,ace'
+    >>> game.event(dict(player=0, event='playCard', card=0))
+    >>> game.event(dict(player=1, event='playCard', card=0))
+    >>> game.event(dict(player=0, event='playCard', card=1))
+    >>> game.event(dict(player=1, event='playCard', card=1))
+
+    # New cards have been distributed!
+    >>> game.lastMessage
+    'Karlotto Distribute 3 cards'
+    >>> game.getPlayer(0).cardsText
+    'red changeIndex=1 cards=jack,king,queen'
+    >>> game.getPlayer(1).cardsText
+    'green changeIndex=2 cards=2,3,4'
     '''
     pass
 

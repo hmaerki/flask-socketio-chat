@@ -51,6 +51,10 @@ class Cards:
     def __init__(self):
         self.__list_cards = Cards.all_cards()
 
+    @property
+    def count(self):
+        return len(self.__list_cards)
+
     def shuffle(self, f):
         f(self.__list_cards)
 
