@@ -21,12 +21,8 @@ groupBoard = snap.g()
 // })
 
 
-var board = groupBoard.image("static/img/board.png", -100, -100, 200, 200);
+var board = groupBoard.image("static/img/" + DogApp.playerCount + "/board.jpg", -100, -100, 200, 200);
 board.attr({
-  // x: 10,
-  // y: 10,
-  // width: 200,
-  // height: 200,
   class: "board"
 })
 
@@ -34,14 +30,6 @@ var angle = DogApp.playerIndex * 360 / DogApp.playerCount
 // groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
 groupBoard.attr({transform: 'r' + angle + ',0,0'});
 
-// var rectBorder = groupBoard.rect(-50, -50, 100, 100, 10, 10)
-// rectBorder.attr({
-//   // fill: "#888",
-//   fill: "#f00",
-//   stroke: "#000",
-//   strokeWidth: 1,
-//   opacity: 0.5,
-// })
 
 //
 // Moving the cicle will emit messages to the server
@@ -83,14 +71,14 @@ var stop = function () {
   console.log('finished dragging');
 }
 
-for (c=0; c<DogApp.playerCount; c++) {
-  for (i=0; i<4; i++) {
-    var circleMarble = groupBoard.image("static/img/color_" + c + ".png", 0, 0, 10, 10);
-    circleMarble.attr({
-      class: "marble_"+c,
-    });
-    circleMarble.node.id="circle"+c+'_'+i
-    circleMarble.drag(move, start, stop)
-  }
+for (i=0; i<4*DogApp.playerCount; i++) {
+  var circleMarble = groupBoard.image("static/img/" + DogApp.playerCount + "/marble" + (10+i) + ".jpg", 0, 0, 10, 10);
+  circleMarble.attr({
+    class: "marble",
+    x: 2*i,
+    y: 1*i
+  });
+  circleMarble.node.id="marble"+i
+  circleMarble.drag(move, start, stop)
 }
 
