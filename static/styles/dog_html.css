@@ -8,18 +8,25 @@ body {
   margin: 0px;
   min-height: 100%;
   width: 100%;
+  background-color:lightgray;
+  /* background-image: url("/static/img/background_table_coarse_banane.jpg");
+  background-repeat: no-repeat;
+  background-size: cover; */
 }
 
 .body_top {
-  height: 10vh; background-color:lightgray;
+  height: 10vh;
+  /* background-color:lightgray; */
 }
 
 .body_middle {
-  height: 65vh; background-color: lightgray;
+  height: 65vh;
+  /* background-color: lightgray; */
 }
 
 .body_bottom {
-  height: 25vh; background-color:lightgray;
+  height: 25vh;
+  /* background-color:lightgray; */
 }
 
 button {

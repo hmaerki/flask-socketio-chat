@@ -20,10 +20,11 @@ groupBoard = snap.g()
 //   strokeWidth: 1
 // })
 
-
+var circleMask = groupBoard.circle(0, 0, 100).attr({ fill: 'white' });
 var board = groupBoard.image("static/img/" + DogApp.playerCount + "/board.jpg", -100, -100, 200, 200);
 board.attr({
-  class: "board"
+  class: "board",
+  mask: circleMask
 })
 
 var angle = DogApp.playerIndex * 360 / DogApp.playerCount
@@ -72,7 +73,7 @@ var stop = function () {
 }
 
 for (i=0; i<4*DogApp.playerCount; i++) {
-  var circleMarble = groupBoard.image("static/img/" + DogApp.playerCount + "/marble" + (10+i) + ".jpg", 0, 0, 10, 10);
+  var circleMarble = groupBoard.image("static/img/" + DogApp.playerCount + "/marble" + (10+i) + ".png", 0, 0, 8, 8);
   circleMarble.attr({
     class: "marble",
     x: 2*i,

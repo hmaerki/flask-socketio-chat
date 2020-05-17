@@ -4,4 +4,4 @@ It covers a simple SocketIO app in Flask.
 
 
 docker build -t dog .
-docker run -it -p 5000:5000 dog
+docker run --rm -it -p 5000:5000 dog

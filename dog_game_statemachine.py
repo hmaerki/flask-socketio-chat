@@ -142,7 +142,7 @@ class GameStatePlay(GameStatemachineBase):
                 self._count_cards_served = self.game.numcards_begin2
                 json.addMessage(msg=f'Cards have been shuffled', msgI18L=f'Karten wurden gemischelt.')
                 self._gameState.shuffleCards(json)
-            json.addMessagePlayer(msg=f'Distribute {self._count_cards_served} cards', msgI18L=f'Verteile {self._count_cards_served} Karten.')
+            json.addMessage(msg=f'Distribute {self._count_cards_served} cards', msgI18L=f'Verteile {self._count_cards_served} Karten')
             self._gameState.serveCards(self._count_cards_served)
 
     def buttonPlayEnabled(self, playerState: dog_game_state.PlayerState):
