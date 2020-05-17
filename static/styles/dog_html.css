@@ -10,6 +10,18 @@ body {
   width: 100%;
 }
 
+.body_top {
+  height: 10vh; background-color:lightgray;
+}
+
+.body_middle {
+  height: 65vh; background-color: lightgray;
+}
+
+.body_bottom {
+  height: 25vh; background-color:lightgray;
+}
+
 button {
   color: black;
   font-weight: bold;
@@ -20,7 +32,18 @@ button:disabled {
   font-weight: unset;
 }
 
-td p {
+p {
+  font-size: 2rem;
+  text-align: center;
+  margin-block-start: 6px;
+  margin-block-end: 6px;
+}
+
+td {
+  text-align: center;
+}
+
+div.body_bottom p {
   margin: 0px;
 }
 
@@ -29,8 +52,6 @@ p#card_in_center {
 }
 
 p#messages {
-  font-size: 1rem;
-  text-align: left;
   /* https://wiki.selfhtml.org/wiki/CSS/Eigenschaften/Anzeige/text-overflow */
   white-space: nowrap;
   overflow: hidden;
