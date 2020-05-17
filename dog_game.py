@@ -47,9 +47,12 @@ class Player:
         pass
 
 class Game:
-    def __init__(self, player_count=2):
+    def __init__(self, player_count=2, numcards_begin1=6, numcards_begin2=5, numcards_end=2):
         self.player_count = player_count
         self.players = [Player(self, index) for index in range(player_count)]
+        self.numcards_begin1 = numcards_begin1
+        self.numcards_begin2 = numcards_begin2
+        self.numcards_end = numcards_end
         self.__gameState = dog_game_state.GameState(self)
 
     @property
@@ -75,7 +78,7 @@ class Game:
 def test_game():
     '''
     >>> dog_constants.dogRandom.seed(0, mockMode=True)
-    >>> game = Game()
+    >>> game = Game(numcards_begin1=3, numcards_begin2=3)
     >>> json_command = []
     >>> game.appendState(json_command)
     >>> x = json_command
@@ -84,9 +87,9 @@ def test_game():
     >>> game.event(dict(player=0, event='newGame'))
     'New State "GameStateExchangeCards"'
     >>> game.getPlayer(0).cardsText
-    'red changeIndex=None cards=2,3,4,5,6,7'
+    'red changeIndex=None cards=2,3,4'
     >>> game.getPlayer(1).cardsText
-    'green changeIndex=None cards=10,8,9,ace,jack,queen'
+    'green changeIndex=None cards=5,6,7'
     >>> game.getAssistance()
     'Asterix, Obelix: Bitte eine Karte tauschen!'
     >>> game.event(dict(player=1, event='setName', name='Karlotto'))
@@ -96,21 +99,42 @@ def test_game():
     >>> game.event(dict(player=0, event='changeCard', card=2))
     'PlayerState red(Asterix): Expected __cardToBeChangedIndex to be "None" but got "1"'
     >>> dog_constants.dogRandom.seed(0, mockMode=True) # Force the seed for the next player
-    >>> game.event(dict(player=1, event='changeCard', card=5))
+    >>> game.event(dict(player=1, event='changeCard', card=2))
     'New State "GameStatePlay"'
     >>> game.getAssistance()
     'Asterix: Bitte Karte ausspielen!'
     >>> game.getPlayer(0).cardsText
-    'red changeIndex=1 cards=2,queen,4,5,6,7'
+    'red changeIndex=1 cards=2,7,4'
     >>> game.getPlayer(1).cardsText
-    'green changeIndex=5 cards=10,8,9,ace,jack,3'
+    'green changeIndex=2 cards=5,6,3'
     >>> game.event(dict(player=1, event='playCard', card=5))
+    'Not your turn!'
     >>> game.lastMessage
-    'Karlotto darf jetzt nicht spielen!'
-    >>> game.event(dict(player=0, event='playCard', card=5))
+    'Karlotto may play know'
+    >>> game.event(dict(player=0, event='playCard', card=2))
     >>> game.lastMessage
-    'Asterix spielt 7'
+    'Asterix plays 4'
+    >>> game.event(dict(player=0, event='playCard', card=1))
+    'Not your turn!'
+    >>> game.event(dict(player=1, event='playCard', card=5))
+    'Card already played'
+    >>> game.event(dict(player=1, event='playCard', card=1))
+    >>> game.event(dict(player=0, event='playCard', card=0))
+    >>> game.event(dict(player=1, event='playCard', card=2))
+    >>> game.event(dict(player=0, event='playCard', card=1))
+    >>> game.getPlayer(0).cardsText
+    'red changeIndex=1 cards=-,-,-'
+    >>> game.getPlayer(1).cardsText
+    'green changeIndex=2 cards=5,-,-'
+    >>> game.event(dict(player=1, event='playCard', card=0))
+    >>> game.getPlayer(0).cardsText
+    'red changeIndex=1 cards=-,-,-'
+    >>> game.getPlayer(1).cardsText
+    'green changeIndex=2 cards=-,-,-'
     '''
-import doctest
-doctest.testmod()
-# TODO: Throw exception
+    pass
+
+if __name__ == '__main__':
+  import doctest
+  failures, tests = doctest.testmod()
+  print('SUCCESS' if failures == 0 else f'{failures} FAILURES')

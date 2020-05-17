@@ -35,9 +35,9 @@ class JsonWrapper:
         except ValueError:
             raise Exception(f'Expected a integer but got "{tag}" in: {self.__json}')
 
-    def addMessage(self, msg:str) -> None:
+    def addMessage(self, msg:str, msgI18L:str) -> None:
         playerIndex = self.getInt('player')
-        self.__gameState.addMessage(playerIndex, msg)
+        self.__gameState.addMessage(playerIndex, msg, msgI18L)
 
     def __repr__(self):
         return repr(self.__json)
@@ -73,7 +73,7 @@ class PlayerState:
     def cardsText(self) -> str:
         def name(card):
             if card is None:
-                return None
+                return '-'
             return card.id
         cards_text = [name(card) for card in self.__cards]
         return f'{self.__player.colorID} changeIndex={self.__cardToBeChangedIndex} cards={",".join(cards_text)}'
@@ -102,12 +102,21 @@ class PlayerState:
         self.__cards[self.__cardToBeChangedIndex] = cardOther
         playerStateOther.__cards[playerStateOther.__cardToBeChangedIndex] = cardSelf
 
-    def playCard(self, card_index: int, f_addMessage:typing.Callable):
+    def playCard(self, json: JsonWrapper, card_index: int, f_addMessage:typing.Callable):
         card = self.__getCardAtIndex(card_index)
-        f_addMessage(f'spielt {card.nameI18N}')
+        if card is None:
+            json.addMessage(msg=': This card is not available', msgI18L=': Diese Karte kannst Du nicht spielen.')
+            return 'Card already played'
+        f_addMessage(msg=f'plays {card.id}', msgI18L=f'spielt {card.nameI18N}')
         self.__game_state.throwCardInCenter(card)
         self.__cards[card_index] = None
+        self.__game_state.cardPlayedSuccessfully(lastCard=self.__lastCard())
 
+    def __lastCard(self):
+        for card in self.__cards:
+            if card is not None:
+                return True
+        return False
 
     def __getCardAtIndex(self, card_index:int):
         '''Returns card or "None"'''
@@ -157,39 +166,39 @@ class GameState:
     def __init__(self, game: dog_game.Game):
         self.__game = game
         self.__statemachine = dog_game_statemachine.GameStateInit(self)
-        self.__player_state = [PlayerState(self, player) for player in self.__game.players]
+        self.__list_player_state = [PlayerState(self, player) for player in self.__game.players]
         self.__cardStack = dog_cards.Cards()
         self.__cardStack.shuffle(dog_constants.dogRandom.shuffle)
         self.__cardInCenter = None
-        self.__messages = []
+        self.__messagesI18L = []
         self.__last_message = '-'
         self.__dictMarbles = {}
 
     @property
     def game(self) -> dog_game.Game:
         return self.__game
-    
+
     @property
     def playersRequireToChange(self):
-        return [player for player in self.__player_state if player.requireToChange]
+        return [player for player in self.__list_player_state if player.requireToChange]
 
     @property
     def lastMessage(self):
         return self.__last_message
 
-    def addMessage(self, playerIndex: int, msg:str) -> None:
-        player = self.__player_state[playerIndex].name
-        msg2 = f'{player} {msg}'
-        self.__last_message = msg2
-        self.__messages.insert(0, msg2)
-        while len(self.__messages) > 5:
-            self.__messages.pop(-1)
+    def addMessage(self, playerIndex: int, msg:str, msgI18L:str) -> None:
+        player = self.__list_player_state[playerIndex].name
+        msg2I18L = f'{player} {msgI18L}'
+        self.__last_message = f'{player} {msg}'
+        self.__messagesI18L.insert(0, msg2I18L)
+        while len(self.__messagesI18L) > 5:
+            self.__messagesI18L.pop(-1)
 
     def getPlayer(self, index: int) -> 'PlayerState':
-        return self.__player_state[index]
+        return self.__list_player_state[index]
 
     def serveCards(self, count_cards: int) -> None:
-        for playerState in self.__player_state:
+        for playerState in self.__list_player_state:
             playerState.serveCards(self.__cardStack.pop_cards(count_cards))
 
     def event(self, json: str) -> typing.Optional[str]:
@@ -200,7 +209,7 @@ class GameState:
             return f'New State "{type(self.__statemachine).__name__}"'
 
     def appendState(self, json: dict) -> None:
-        for playerState in self.__player_state:
+        for playerState in self.__list_player_state:
             playerState.appendState(json, self.__statemachine)
 
         json.append({
@@ -210,7 +219,7 @@ class GameState:
 
         json.append({
             'html_id': '#messages',
-            'html': ' / '.join(self.__messages)
+            'html': ' / '.join(self.__messagesI18L)
         })
 
         cardInCentre = ''
@@ -228,7 +237,7 @@ class GameState:
         return self.__statemachine.getAssistance()
 
     def setName(self, player:int, name:str):
-        return self.__player_state[player].setName(name)
+        return self.__list_player_state[player].setName(name)
 
     def setMarble(self, dictPosition: dict) -> None:
         # ['circle1_0', 0, 0, 0]
@@ -236,10 +245,10 @@ class GameState:
         self.__dictMarbles[svg_id] = dictPosition
 
     def cardToBeChanged(self, player:int, index:int):
-        return self.__player_state[player].cardToBeChanged(index)
+        return self.__list_player_state[player].cardToBeChanged(index)
 
-    def playCard(self, player:int, index:int, f_addMessage:typing.Callable):
-        return self.__player_state[player].playCard(index, f_addMessage)
+    def playCard(self, json: JsonWrapper, player:int, index:int, f_addMessage:typing.Callable):
+        return self.__list_player_state[player].playCard(json, index, f_addMessage)
 
     def changeCards(self):
         if len(self.playersRequireToChange) > 0:
@@ -247,8 +256,11 @@ class GameState:
         player_count_half = self.__game.player_count//2
         for index_A in range(player_count_half):
             index_B = index_A + player_count_half
-            self.__player_state[index_A].changeCard(self.__player_state[index_B])
+            self.__list_player_state[index_A].changeCard(self.__list_player_state[index_B])
         return True
+
+    def cardPlayedSuccessfully(self, lastCard: bool) -> None:
+        self.__statemachine.cardPlayedSuccessfully(lastCard)
 
     # def throwCardInCenter(self, card:dog_cards.Card) -> None:
     def throwCardInCenter(self, card):

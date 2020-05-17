@@ -1,6 +1,5 @@
 import random as r
 
-INITIAL_CARDS_TO_BE_SERVED = 6
 COUNT_PLAYER_CARDS = 6
 
 

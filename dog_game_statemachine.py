@@ -27,26 +27,29 @@ class GameStatemachineBase:
     def event(self, json: dog_game_state.JsonWrapper) -> typing.Optional[str]:
         raise NotImplementedError()
 
+    def cardPlayedSuccessfully(self, lastCard: bool) -> None:
+        None
+
     def handleGenericEvent(self, json: dog_game_state.JsonWrapper) -> typing.Optional[str]:
         '''
         Events which always are valid.
         return True if event was handled
         '''
         if json.isEvent('newGame'):
-            json.addMessage('beginnt ein neues Spiel')
+            json.addMessage( msg='starts a new game', msgI18L='beginnt ein neues Spiel')
             raise NewGameStateException(GameStateExchangeCards(self._gameState))
 
         if json.isEvent('setName'):
             playerIndex = json.getInt('player')
             playerName = json.getStr('name')
-            json.addMessage(f'heisst neu {playerName}')
+            json.addMessage(msg=f'is now {playerName}', msgI18L=f'heisst neu {playerName}')
             self._gameState.setName(playerIndex, playerName)
             return True
 
         if json.isEvent('rotateBoard'):
             playerIndex = json.getInt('player')
             logging.warning(f'Player {playerIndex} rotated.')
-            json.addMessage('dreht das Spielbrett')
+            json.addMessage(msg=f'turns the board', msgI18L='dreht das Spielbrett')
             return True
 
         if json.isEvent('browserConnected'):
@@ -83,7 +86,7 @@ class GameStateInit(GameStatemachineBase):
 class GameStateExchangeCards(GameStatemachineBase):
     def __init__(self, gameState: dog_game_state.GameState):
         super().__init__(gameState)
-        self._gameState.serveCards(dog_constants.INITIAL_CARDS_TO_BE_SERVED)
+        self._gameState.serveCards(self.game.numcards_begin1)
 
     @property
     def playersRequireToChangeText(self):
@@ -96,7 +99,7 @@ class GameStateExchangeCards(GameStatemachineBase):
         if json.isEvent('changeCard'):
             playerIndex = json.getInt('player')
             cardIndex = json.getInt('card')
-            json.addMessage('tauscht')
+            json.addMessage(msg='changes a card', msgI18L='tauscht')
             err = self._gameState.cardToBeChanged(playerIndex, cardIndex)
             if self._gameState.changeCards():
                 raise NewGameStateException(GameStatePlay(self._gameState))
@@ -112,7 +115,7 @@ class GameStateExchangeCards(GameStatemachineBase):
 class GameStatePlay(GameStatemachineBase):
     def __init__(self, gameState: dog_game_state.GameState):
         super().__init__(gameState)
-        self._count_cards_served = dog_constants.INITIAL_CARDS_TO_BE_SERVED
+        self._count_cards_served = self.game.numcards_begin1
         self._playerToPlayIndex = dog_constants.dogRandom.randint(0, self._gameState.game.player_count-1)
 
     def event(self, json: dog_game_state.JsonWrapper) -> typing.Optional[str]:
@@ -123,12 +126,22 @@ class GameStatePlay(GameStatemachineBase):
             playerIndex = json.getInt('player')
             cardIndex = json.getInt('card')
             if playerIndex != self._playerToPlayIndex:
-                json.addMessage('darf jetzt nicht spielen!')
-                return
-            self._gameState.playCard(playerIndex, cardIndex, json.addMessage)
-            return
+                json.addMessage(msg='may play know', msgI18L='darf jetzt nicht spielen!')
+                return 'Not your turn!'
+            return self._gameState.playCard(json, playerIndex, cardIndex, json.addMessage)
 
         return self.unexpectedEvent(json)
+
+    def cardPlayedSuccessfully(self, lastCard: bool) -> None:
+        self._playerToPlayIndex = (self._playerToPlayIndex + 1) % self.game.player_count
+        # If there are no more cards, shuffle and distribute
+        return
+        if lastCard and (self._playerToPlayIndex == 0):
+            # self.game.shuffle()
+            self._count_cards_served -= 1
+            if self._count_cards_served < self.game.numcards_end:
+                self._count_cards_served = self.game.numcards_begin2
+            self._gameState.serveCards(self._count_cards_served)
 
     def buttonPlayEnabled(self, playerState: dog_game_state.PlayerState):
         return self._playerToPlayIndex == playerState.player.index
