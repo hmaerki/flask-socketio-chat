@@ -19,6 +19,14 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Python: Webserver",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/image_preparation/httpserver.py",
+            "cwd": "${workspaceFolder}/image_preparation",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

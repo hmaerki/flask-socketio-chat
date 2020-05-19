@@ -29,7 +29,7 @@
     groupBoard = snapBoard.g()
 
     var circleMask = groupBoard.circle(0, 0, 100).attr({ fill: 'white' });
-    var board = groupBoard.image("dog_board_0.jpg", -100, -100, 200, 200);
+    var board = groupBoard.image("/static/img/4/board.jpg", -100, -100, 200, 200);
     board.attr({
       class: "draggable",
       mask: circleMask
@@ -67,7 +67,7 @@
 
     // http://svg.dabbles.info/snaptut-load-animate
     // var card = Snap.load("/static/cards/103.svg", function(frag) {
-    var card = Snap.load("/image_preparation/003_small.svg", function(fragCard) {
+    var card = Snap.load("/static/image_preparation/003_small.svg", function(fragCard) {
       // var cardRect = fragCard.node.lastElementChild
 
       var cardSvg = fragCard.select('svg')
