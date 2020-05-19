@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- https://www.w3schools.com/graphics/svg_intro.asp -->
 <html>
-
-<body style="background:lightgray;">
+  <style>
+    .body {
+      background:lightgray;
+    }
+    /* .card {
+      filter: drop-shadow(0px 30px 30px rgba(0, 0, 0, 1.0));
+    }
+    .cardMaskClass {
+      filter: drop-shadow(0px 30px 30px rgba(0, 0, 0, 1.0));
+    } */
+  </style>
+</head>
+<body>
+  
   <svg id="svg" width="100%" , height="100vh"></svg>
 
   <script src="snap.svg.js"></script>
@@ -22,7 +34,57 @@
       class: "draggable",
       mask: circleMask
     })
-    groupBoard.animate({ transform: 'r90,0,0' }, 5000, mina.bounce);
+    // groupBoard.animate({ transform: 'r90,0,0' }, 5000, mina.bounce);
+
+    // http://svg.dabbles.info/snaptut-load
+    var move = function(dx,dy) {
+      this.attr({
+                  transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
+              });
+      var svgNode = this.node.childNodes[1]
+      // console.log('cx:' + svgNode.x.baseVal.value)
+      var t = this.transform()
+      // console.log('transform:' + t.local)
+      var x = t.localMatrix.e
+      var y = t.localMatrix.f
+      console.log('x:' + x + ' y:' + y)
+
+      if (y > 70) {
+        opacity = 0.0
+      } else {
+        d = Math.abs(x)+Math.abs(y)
+        opacity = 0.05*(d-25)
+      }
+      var rect = this.select('rect.cardMaskClass')
+      rect.attr({ opacity: opacity })
+    }
+    var start = function() {
+        this.data('origTransform', this.transform().local );
+    }
+    var stop = function() {
+        console.log('finished dragging');
+    }
+
+    // http://svg.dabbles.info/snaptut-load-animate
+    // var card = Snap.load("/static/cards/103.svg", function(frag) {
+    var card = Snap.load("/image_preparation/003_small.svg", function(fragCard) {
+      // var cardRect = fragCard.node.lastElementChild
+
+      var cardSvg = fragCard.select('svg')
+      var cardRect = fragCard.select('rect')
+      cardMask = cardRect.clone()
+      cardMask.attr({ class:'cardMaskClass', fill: 'lightgray', opacity: 0.0 })
+      cardSvg.append(cardMask)
+
+      // var shadow = cardSvg.filter(Snap.filter.shadow(10, 20, 0.5));
+      // cardSvg.attr({ filter: shadow });
+
+      groupCard = groupBoard.g()
+      groupCard.append(fragCard)
+      groupCard.drag(move, start, stop);
+    });
+
+
 
   </script>
 </body>
