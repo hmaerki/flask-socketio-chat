@@ -1,4 +1,4 @@
-Peter Maerki 2020-05-19_23_49_15https
+Peter Maerki 2020-05-19
 
 https://www.me.uk/cards/makeadeck.cgi
 
