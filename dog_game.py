@@ -1,18 +1,28 @@
 
-import logging
+import math
 import typing
-
+import logging
 
 import dog_cards
 import dog_constants
-import dog_game_state
-import dog_game_statemachine
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
+class Card:
+    def __init__(self, x_initial: int, y_initial: int):
+        self.__layer = 0
+        self.__face_index = 22
+        self.__x = x_initial
+        self.__y = y_initial
+        self.__x_initial = x_initial
+        self.__y_initial = y_initial
+
+    @property
+    def json(self):
+        return (int(self.__x), int(self.__y))
 
 class GameState:
     def __init__(self, game: 'Game'):
@@ -25,10 +35,32 @@ class GameState:
     def dgc(self) -> dog_constants.DogGameConstants:
         return self.game.dgc
 
+    @property
+    def dbc(self) -> dog_constants.DogGameConstants:
+        return self.game.dbc
+
     def reset(self) -> None:
-        self.list_player_names = list(self.dgc.PLAYER_NAMES_DEFAULTS)
         self.__game_dirty = True
         self.__board_dirty = True
+        self.list_player_names = list(self.dgc.PLAYER_NAMES_DEFAULTS)
+        self.__initializeCards()
+
+    def __initializeCards(self):
+        def generator():
+            for playerIndex in range(self.dgc.PLAYER_COUNT):
+                # playerAngle = 90.0 * playerIndex
+                for cardCenter in self.dbc.LIST_CARD_CENTER:
+                    # cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
+                    x_initial = cardCenter.real
+                    y_initial = cardCenter.imag
+                    yield Card(x_initial, y_initial)
+
+        self.__list_cards = list(generator())
+
+        # self.__dict_cars = {}
+        # for playerIndex in range(self.dgc.PLAYER_COUNT):
+        #     for cardIndex in range(dog_constants.MAX_CARDS_PER_PLAYER):
+        #         self.__dict_cars[playerIndex] = cardIndex*('A')
 
     def boardDirty(self):
         self.__game_dirty = True
@@ -38,6 +70,10 @@ class GameState:
         self.__game_dirty = True
 
     def event(self, json: str) -> typing.Optional[str]:
+        if json['event'] == 'browserConnected':
+            self.gameDirty()
+            return
+
         if json['event'] == 'newName':
             idx = json['idx']
             name = json['name']
@@ -64,7 +100,9 @@ class GameState:
     def appendStateGame(self, json: dict) -> None:
         self.__game_dirty = False
         json['playerNames'] = self.list_player_names
-    
+
+        json['cards'] = [card.json for card in self.__list_cards]
+
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False
     

@@ -6,7 +6,9 @@ import dog_constants_6
 
 DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent
 
-COUNT_PLAYER_CARDS_OBSOLETE = 6
+# COUNT_PLAYER_CARDS_OBSOLETE = 6
+
+MAX_CARDS_PER_PLAYER = 6
 
 LIST_PLAYER_COUNT = (2, 4, 6)
 LIST_BOARD_ID = (4, 6)

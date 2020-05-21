@@ -11,11 +11,24 @@ $(document).ready(function () {
 
     var playerNames = json['playerNames']
     if (playerNames) {
-      for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
-        var svg_element = $('text#'+i+'name')
-        svg_element.text(playerNames[i])
-      }
-      return
+      playerNames.forEach(function (playerName, index) {
+        var svg_element = $('text#'+index+'name')
+        svg_element.text(playerName)
+      });
+    }
+
+    var cards = json['cards']
+    if (cards) {
+      cards.forEach(function (card, index) {
+        var x = card[0]
+        var y = card[1]
+        // console.log('card: ' + card + ', x: ' + x)
+        var svg_element = $('#'+index+'card')
+        svg_element.each(function () {
+          this.setAttribute('x', x);
+          this.setAttribute('y', y);
+        });
+      });
     }
 
       // console.log('Received "json": ' + JSON.stringify(json));

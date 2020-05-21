@@ -28,6 +28,20 @@ board.attr({
   mask: circleMask
 })
 
+for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
+  for (var c = 0; c < 6; c++) { 
+    id = i*{{ game.dgc.PLAYER_COUNT }}+c+'card'
+    textCard = groupBoard.text(0, 60, 'Card ' + id)
+    textCard.attr({
+      fontSize: '6px'
+    });
+    textCard.node.id = id
+    // var angle = i*360.0/{{game.dgc.PLAYER_COUNT}}
+    // textCard.animate({ transform: 'r' + angle + ',0,0' }, 5000, mina.bounce );
+    // textCard.click(card_click)
+  }
+}
+
 var name_click = function() {
   name = window.prompt("Name:", "...");
   if (name) {

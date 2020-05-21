@@ -39,6 +39,15 @@ def handleMessage(msg):
     print(f'Message: {msg}\n')
     socketio.send(f'MESSAGE:{msg}', broadcast=True)
 
+# def sendGameState():
+#     try:
+#         json_command = {}
+#         game.appendState(json_command)
+#         socketio.send(json_command, json=True, broadcast=True)
+#     except Exception as e:
+#         logging.error(f'******************* Error during game.event(): {e}')
+#         raise
+
 @socketio.on('event')
 def handleEvent(json):
     print(f'Json: {json}\n')
@@ -59,7 +68,6 @@ def handleEvent(json):
     #         # player5_changeCard
     #         json['event'] = match_event.event
     #         json['player'] = int(match_event.player)
-
     try:
         game.event(json)
         json_command = {}
