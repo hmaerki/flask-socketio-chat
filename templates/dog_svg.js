@@ -51,9 +51,9 @@ for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
 var button_click = function() {
   var label = this.node.textContent
   if (label === 'R') {
-    DogApp.playerIndex += 1
+    DogApp.playerIndex = (1+DogApp.playerIndex) % {{game.dgc.PLAYER_COUNT}}
     var angle = DogApp.playerIndex*360.0/{{game.dgc.PLAYER_COUNT}}
-    groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
+    groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce );
     return;
   }
   var msg = { event: 'buttonPressed', label: label};
@@ -62,7 +62,7 @@ var button_click = function() {
 
 const buttons = ["G2", "G4", "G6", "C", "R", "2", "3", "4", "5", "6"]
 buttons.forEach(function (text, i) {
-  textButton = groupBoard.text(-120,90-i*12, text)
+  textButton = snap.text(-120,90-i*12, text)
   textButton.attr({
     fontSize: '10px',
     "text-anchor": "middle",
