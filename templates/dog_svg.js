@@ -11,16 +11,15 @@
 // var snap = Snap("#svg");
 var snap = Snap("#svg");
 // TODO(Peter): Values
-snap.attr({ viewBox: "-130 -130 260 260" });
+snap.attr({ viewBox: "-140 -140 280 280" });
 
 groupBoard = snap.g()
+// A initial transformation is needed!
+groupBoard.attr({transform: 'r0,0,0'});
 
-// var lineTopdiag = groupBoard.line(-90, -90, 90, 90)
-// lineTopdiag.attr({
-//   stroke: "#000",
-//   strokeWidth: 1
-// })
-
+//
+// The board
+//
 var circleMask = groupBoard.circle(0, 0, 100).attr({ fill: 'white' });
 var board = groupBoard.image("static/board{{ game.dbc.BOARD_ID }}/board.jpg", -100, -100, 200, 200);
 board.attr({
@@ -28,17 +27,53 @@ board.attr({
   mask: circleMask
 })
 
+//
+// The cards
+//
+var card_drag_move = function (dx, dy, mouseX, mouseY) {
+  // Moving the card will emit messages to the server
+  m = groupBoard.node.transform.baseVal[0].matrix
+
+  dx2 = + m.a*dx - m.c*dy;
+  dy2 = - m.b*dx + m.d*dy;
+
+  m = snap.transform().globalMatrix;
+  factor = m.a;
+  dx2 /= factor;
+  dy2 /= factor;
+  cx = DogApp.start_card_drag_x + dx2;
+  cy = DogApp.start_card_drag_y + dy2;
+
+  var msg = [parseInt(this.node.id), cx|0, cy|0]
+  console.log(msg)
+  DogApp.socket.emit("moveCard", msg);
+}
+
+var card_drag_start = function () {
+  m = this.node.transform.baseVal[0].matrix
+
+  DogApp.start_card_drag_x = m.e;
+  DogApp.start_card_drag_y = m.f;
+}
+
+var card_drag_stop = function () {
+  console.log('finished dragging');
+}
+
 for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
-  for (var c = 0; c < 6; c++) { 
-    id = i*{{ game.dgc.PLAYER_COUNT }}+c+'card'
-    textCard = groupBoard.text(0, 60, 'Card ' + id)
-    textCard.attr({
-      fontSize: '6px'
-    });
-    textCard.node.id = id
-    // var angle = i*360.0/{{game.dgc.PLAYER_COUNT}}
-    // textCard.animate({ transform: 'r' + angle + ',0,0' }, 5000, mina.bounce );
-    // textCard.click(card_click)
+  for (var c = 0; c < 6; c++) {
+    var create_card = function(id) {
+      var url = "/static/board4/cards/2/2C.svg";
+      var card = Snap.load(url, function(fragCard) {
+        groupCard = groupBoard.g()
+        groupCard.attr({'transform': 't0,0r0,0'})
+        console.log('card:'+id)
+        groupCard.node.id = id
+        groupCard.append(fragCard)
+        groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
+      });
+    }
+    create_card(i*6+c+'card')
   }
 }
 
@@ -50,7 +85,7 @@ var name_click = function() {
   }
 }
 
-for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) { 
+for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
   textPlayer = groupBoard.text(0,70, 'Player ' + i)
   textPlayer.attr({
     fontSize: '10px',
@@ -58,7 +93,7 @@ for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
   });
   textPlayer.node.id = i+'name'
   var angle = i*360.0/{{game.dgc.PLAYER_COUNT}}
-  textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 5000, mina.bounce );
+  textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
   textPlayer.click(name_click)
 }
 

@@ -12,17 +12,23 @@ logging.basicConfig(level=logging.DEBUG)
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
 class Card:
-    def __init__(self, x_initial: int, y_initial: int):
+    def __init__(self, id: int, angle: int, x_initial: int, y_initial: int):
+        self.__id = id
         self.__layer = 0
         self.__face_index = 22
+        self.__angle = angle
         self.__x = x_initial
         self.__y = y_initial
         self.__x_initial = x_initial
         self.__y_initial = y_initial
 
+    def move(self, x:int, y:int):
+        self.__x = x
+        self.__y = y
+
     @property
     def json(self):
-        return (int(self.__x), int(self.__y))
+        return (int(self.__angle), int(self.__x), int(self.__y))
 
 class GameState:
     def __init__(self, game: 'Game'):
@@ -48,19 +54,17 @@ class GameState:
     def __initializeCards(self):
         def generator():
             for playerIndex in range(self.dgc.PLAYER_COUNT):
-                # playerAngle = 90.0 * playerIndex
-                for cardCenter in self.dbc.LIST_CARD_CENTER:
-                    # cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
-                    x_initial = cardCenter.real
-                    y_initial = cardCenter.imag
-                    yield Card(x_initial, y_initial)
+                angleDeg = 360.0 * playerIndex / self.dgc.PLAYER_COUNT
+                playerAngle = 2 * math.pi * playerIndex / self.dgc.PLAYER_COUNT
+                for cardIndex, cardCenter in enumerate(self.dbc.LIST_CARD_CENTER):
+                    id = playerIndex* self.dgc.PLAYER_COUNT + cardIndex
+                    cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
+                    x_initial = cardCenterRotated.real
+                    y_initial = cardCenterRotated.imag
+                    yield Card(id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial)
 
         self.__list_cards = list(generator())
-
-        # self.__dict_cars = {}
-        # for playerIndex in range(self.dgc.PLAYER_COUNT):
-        #     for cardIndex in range(dog_constants.MAX_CARDS_PER_PLAYER):
-        #         self.__dict_cars[playerIndex] = cardIndex*('A')
+        print(f'self.__list_cards: {len(self.__list_cards)}')
 
     def boardDirty(self):
         self.__game_dirty = True
@@ -102,6 +106,11 @@ class GameState:
         json['playerNames'] = self.list_player_names
 
         json['cards'] = [card.json for card in self.__list_cards]
+
+    def moveCard(self, id:int, x:int, y:int) -> dict:
+        card = self.__list_cards[id]
+        card.move(x=x, y=y)
+        return {'card': (id, card.json)}
 
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False
@@ -157,6 +166,9 @@ class Game:
 
     def appendState(self, json: dict) -> None:
         self.__gameState.appendState(json)
+
+    def moveCard(self, id:int, x:int, y:int) -> dict:
+        return self.__gameState.moveCard(id=id, x=x, y=y)
 
     def getAssistance(self):
         return self.__gameState.getAssistance()

@@ -17,17 +17,55 @@ $(document).ready(function () {
       });
     }
 
+    var placeCard = function(id, card) {
+      var angle = card[0]
+      var x = card[1]
+      var y = card[2]
+      // console.log('card: ' + card + ', x: ' + x)
+      var svg_element = $('g#'+id+'card')
+      svg_element.each(function () {
+        // var angle = 30.0
+
+        // this.setAttribute('x', x);
+        // this.setAttribute('y', y);
+        this.setAttribute('transform', 'translate('+x+','+y+') rotate('+angle+' 0 0)');
+        // this.setAttribute('rotate', 30);
+        // this.transform('r'+angle+',0,0');
+      });
+    }
+  
+    var card = json['card']
+    if (card) {
+      placeCard(card[0], card[1])
+      // var id = card[0]
+      // var x = card[1]
+      // var y = card[2]
+      // var svg_element = $('g#'+id+'card')
+      // svg_element.each(function () {
+      //   this.setAttribute('transform', 'translate('+x+','+y+')');
+      // });
+    }
+
     var cards = json['cards']
     if (cards) {
-      cards.forEach(function (card, index) {
-        var x = card[0]
-        var y = card[1]
+      cards.forEach(function (card, id) {
+        placeCard(id, card)
+        /*
+        var angle = card[0]
+        var x = card[1]
+        var y = card[2]
         // console.log('card: ' + card + ', x: ' + x)
-        var svg_element = $('#'+index+'card')
+        var svg_element = $('g#'+index+'card')
         svg_element.each(function () {
-          this.setAttribute('x', x);
-          this.setAttribute('y', y);
+          // var angle = 30.0
+
+          // this.setAttribute('x', x);
+          // this.setAttribute('y', y);
+          this.setAttribute('transform', 'translate('+x+','+y+') rotate('+angle+' 0 0)');
+          // this.setAttribute('rotate', 30);
+          // this.transform('r'+angle+',0,0');
         });
+        */
       });
     }
 

@@ -78,10 +78,17 @@ def handleEvent(json):
         raise
 
 @socketio.on('marble')
-def handleMove(json: dict):
-    print(f'Json: {json}\n')
+def handleMoveMarble(json: dict):
+    print(f'handleMoveMarble Json: {json}\n')
     game.setMarble(json)
     socketio.send([json], json=True, broadcast=True)
+
+@socketio.on('moveCard')
+def handleMoveCard(json: dict):
+    print(f'handleMoveCard Json: {json}\n')
+    id, x, y = json
+    json_msg = game.moveCard(id=id, x=x, y=y)
+    socketio.send(json_msg, json=True, broadcast=True)
 
 @app.route('/')
 def index():
