@@ -10,7 +10,8 @@
 // like snap = Snap(800, 600);
 // var snap = Snap("#svg");
 var snap = Snap("#svg");
-snap.attr({ viewBox: "-100 -100 200 200" });
+// TODO(Peter): Values
+snap.attr({ viewBox: "-130 -130 260 260" });
 
 groupBoard = snap.g()
 
@@ -29,17 +30,14 @@ board.attr({
 
 var name_click = function() {
   name = window.prompt("Name:", "...");
-  // TODO: Send name to server
   var msg = { event: 'newName', idx: parseInt(this.node.id), name: name};
   DogApp.socket.emit("event", msg);
 }
-
 
 for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) { 
   textPlayer = groupBoard.text(0,70, 'Player ' + i)
   textPlayer.attr({
     fontSize: '10px',
-    opacity: 1.0,
     "text-anchor": "middle"
   });
   textPlayer.node.id = i+'name'
@@ -48,6 +46,24 @@ for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
   textPlayer.click(name_click)
 }
 
+var button_click = function() {
+  var msg = { event: 'buttonPressed', label: this.node.textContent};
+  console.log(msg)
+  DogApp.socket.emit("event", msg);
+}
+
+const buttons = ["C", "R", "2", "3", "4", "5", "6"]
+buttons.forEach(function (text, i) {
+  console.log(text, i);
+  textButton = groupBoard.text(-120,90-i*12, text)
+  textButton.attr({
+    fontSize: '10px',
+    "text-anchor": "middle",
+    class: 'button'
+  });
+  textButton.node.id = i+'button'
+  textButton.click(button_click)
+});
 
 // var angle = DogApp.playerIndex * 360 / DogApp.playerCount
 // groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );

@@ -28,8 +28,36 @@ class GameState:
             name = json['name']
             self.list_player_names[idx] = name
 
+        if json['event'] == 'buttonPressed':
+            label = json['label']
+            method = f'button_{label.upper()}'
+            f = getattr(self, method)
+            assert f is not None
+            f()
+
     def appendState(self, json: dict) -> None:
         json['playerNames'] = self.list_player_names
+    
+    def button_C(self):
+        print('button_C')
+
+    def button_R(self):
+        print('button_R')
+
+    def button_2(self):
+        print('button_2')
+
+    def button_3(self):
+        print('button_3')
+
+    def button_4(self):
+        print('button_4')
+
+    def button_5(self):
+        print('button_5')
+
+    def button_6(self):
+        print('button_6')
 
 class Game:
     def __init__(self, dgc: dog_constants.DogGameConstants):

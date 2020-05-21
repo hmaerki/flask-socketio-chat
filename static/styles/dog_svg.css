@@ -17,6 +17,10 @@ pre.code {
   opacity: none;
 }
 
+/* text.button {
+  fill: #000;
+} */
+
 #codelines {
   display: none;
 }
