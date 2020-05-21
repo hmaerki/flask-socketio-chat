@@ -6,9 +6,8 @@ import jinja2
 import flask
 import flask_socketio
 
-import dog_game
 import dog_constants
-import dog_html
+import dog_game
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'

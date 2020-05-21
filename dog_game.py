@@ -5,9 +5,11 @@ import logging
 
 import dog_cards
 import dog_constants
+import dog_patch_cards
 
 logging.basicConfig(level=logging.DEBUG)
 
+dog_patch_cards.CardsPatcher.convert_cards()
 
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
@@ -83,7 +85,6 @@ class GameState:
                     yield PlayersCard(gameState=self, id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial, card=card)
 
         self.__list_cards = list(generator())
-        print(f'self.__list_cards: {len(self.__list_cards)}')
 
     def boardDirty(self):
         self.__game_dirty = True
