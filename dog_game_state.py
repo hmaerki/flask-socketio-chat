@@ -143,7 +143,7 @@ class PlayerState:
         })
 
         # Update the play cards buttons
-        for card_index in range(dog_constants.COUNT_PLAYER_CARDS):
+        for card_index in range(dog_constants.COUNT_PLAYER_CARDS_OBSOLETE):
             enabled = self.__enableCardAtIndex(card_index, statemachineState.buttonPlayEnabled(self))
             json.append({
                 'html_id': f'button#player{self.__player.index}_playCard[name="{card_index}"]',
@@ -151,7 +151,7 @@ class PlayerState:
             })
 
         # Update the cards
-        for card_index in range(dog_constants.COUNT_PLAYER_CARDS):
+        for card_index in range(dog_constants.COUNT_PLAYER_CARDS_OBSOLETE):
             card = self.__getCardAtIndex(card_index)
             card_name = '-' if card is None else card.nameI18N
             json.append({
