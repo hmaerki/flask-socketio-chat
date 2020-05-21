@@ -56,8 +56,13 @@ var button_click = function() {
     groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce );
     return;
   }
+
   var msg = { event: 'buttonPressed', label: label};
   DogApp.socket.emit("event", msg);
+
+  if (label.startsWith('G')) {
+    window.location.reload(false);
+  }
 }
 
 const buttons = ["G2", "G4", "G6", "C", "R", "2", "3", "4", "5", "6"]
