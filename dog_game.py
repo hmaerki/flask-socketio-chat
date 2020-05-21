@@ -11,27 +11,40 @@ logging.basicConfig(level=logging.DEBUG)
 
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
-class Card:
-    def __init__(self, id: int, angle: int, x_initial: int, y_initial: int):
+class PlayersCard:
+    def __init__(self, gameState: 'GameState', id: int, angle: int, x_initial: int, y_initial: int, card: dog_cards.Card):
+        self.__gameState = gameState
         self.__id = id
         self.__layer = 0
-        self.__face_index = 22
         self.__angle = angle
         self.__x = x_initial
         self.__y = y_initial
         self.__x_initial = x_initial
         self.__y_initial = y_initial
+        self.__card = card
 
     def move(self, x:int, y:int):
         self.__x = x
         self.__y = y
 
+    def setCard(self, card: dog_cards.Card):
+        self.__card = card
+
     @property
-    def json(self):
+    def url(self):
+        return f'/static/{self.__gameState.dbc.BOARD_ID}/cards/{self.__card.filename}'
+
+    @property
+    def jsonMove(self):
         return (int(self.__angle), int(self.__x), int(self.__y))
+
+    @property
+    def jsonAll(self):
+        return (int(self.__angle), int(self.__x), int(self.__y), self.url, self.__card.descriptionI18N)
 
 class GameState:
     def __init__(self, game: 'Game'):
+        self.__cards = dog_cards.Cards()
         self.game = game
         self.reset()
         self.__game_dirty = False
@@ -61,7 +74,8 @@ class GameState:
                     cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
                     x_initial = cardCenterRotated.real
                     y_initial = cardCenterRotated.imag
-                    yield Card(id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial)
+                    card = self.__cards.pop_card()
+                    yield PlayersCard(gameState=self, id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial, card=card)
 
         self.__list_cards = list(generator())
         print(f'self.__list_cards: {len(self.__list_cards)}')
@@ -105,12 +119,12 @@ class GameState:
         self.__game_dirty = False
         json['playerNames'] = self.list_player_names
 
-        json['cards'] = [card.json for card in self.__list_cards]
+        json['cards'] = [card.jsonAll for card in self.__list_cards]
 
     def moveCard(self, id:int, x:int, y:int) -> dict:
         card = self.__list_cards[id]
         card.move(x=x, y=y)
-        return {'card': (id, card.json)}
+        return {'card': (id, card.jsonMove)}
 
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False

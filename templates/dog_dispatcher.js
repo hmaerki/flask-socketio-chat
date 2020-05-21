@@ -36,7 +36,7 @@ $(document).ready(function () {
   
     var card = json['card']
     if (card) {
-      placeCard(card[0], card[1])
+      placeCard(card[0], card[1].slice(0, 3))
       // var id = card[0]
       // var x = card[1]
       // var y = card[2]

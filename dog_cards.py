@@ -1,3 +1,4 @@
+COLOURS = ('', 'C', 'D', 'H', 'S')
 
 LIST_4_COLOURS = (
     # https://docs.google.com/spreadsheets/d/1fnAL9Csg0xfkZqHPyxq1r5kL7MLX200DlCBzDXKeito/edit?usp=sharing
@@ -19,12 +20,18 @@ LIST_4_COLOURS = (
 JOKER = dict(id="joker", german=dict(name="Joker", description="Karte nach Wunsch. Als letzte Karte zum Sieg darf der Joker nicht gelegt werden."))
 
 class Card:
-    def __init__(self, dict_card):
+    def __init__(self, dict_card: dict, color: str):
+        assert color in COLOURS
         self.__dict_card = dict_card
+        self.__color = color
 
     @property
     def id(self) -> str:
         return self.__dict_card['id']
+
+    @property
+    def filename(self) -> str:
+        return f'{self.id}{self.__color}.svg'
 
     @property
     def nameI18N(self) -> str:
@@ -37,16 +44,16 @@ class Card:
 class Cards:
     @classmethod
     def create_cards(cls):
-        for _i1 in range(2): # Two sets
-            for _i2 in range(4): # For colours
+        for _set in range(2): # Two sets
+            for color in COLOURS: # Four colours
                 for dict_card in LIST_4_COLOURS:
-                    yield dict_card
-            for _i3 in range(3): # 3 Jokers
-                yield JOKER
+                    yield Card(dict_card, color)
+            for _jokers in range(3): # 3 Jokers
+                yield Card(JOKER, '')
 
     @classmethod
     def all_cards(cls):
-        return [Card(dict_card) for dict_card in Cards.create_cards()]
+        return list(Cards.create_cards())
 
     def __init__(self):
         self.__list_cards = Cards.all_cards()
