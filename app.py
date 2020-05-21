@@ -32,7 +32,7 @@ params = dict(
 # socketio = flask_socketio.SocketIO(app, ping_timeout=20, ping_interval=10)
 socketio = flask_socketio.SocketIO(app, **params)
 
-game = dog_game.Game(dog_constants.DOG_GAME_CONSTANTS_2)
+game = dog_game.Game()
 
 @socketio.on('message')
 def handleMessage(msg):

@@ -15,18 +15,34 @@ INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 
 
 class GameState:
-    def __init__(self, game: 'Game', dgc: dog_constants.DogGameConstants):
-        self.dgc = dgc
-        self.list_player_names = list(dgc.PLAYER_NAMES_DEFAULTS)
-        # self.dict_id = {}
-        # for playerIndex, name in enumerate(dgc.PLAYER_NAMES_DEFAULTS):
-        #     self.dict_id[game.html.playerIndexToId(playerIndex)] = name
+    def __init__(self, game: 'Game'):
+        self.game = game
+        self.reset()
+        self.__game_dirty = False
+        self.__board_dirty = False
+
+    @property
+    def dgc(self) -> dog_constants.DogGameConstants:
+        return self.game.dgc
+
+    def reset(self) -> None:
+        self.list_player_names = list(self.dgc.PLAYER_NAMES_DEFAULTS)
+        self.__game_dirty = True
+        self.__board_dirty = True
+
+    def boardDirty(self):
+        self.__game_dirty = True
+        self.__board_dirty = True
+
+    def gameDirty(self):
+        self.__game_dirty = True
 
     def event(self, json: str) -> typing.Optional[str]:
         if json['event'] == 'newName':
             idx = json['idx']
             name = json['name']
             self.list_player_names[idx] = name
+            self.gameDirty()
 
         if json['event'] == 'buttonPressed':
             label = json['label']
@@ -36,10 +52,33 @@ class GameState:
             f()
 
     def appendState(self, json: dict) -> None:
+        if self.__board_dirty:
+            self.appendStateBoard(json)
+            self.appendStateGame(json)
+            return
+
+        if self.__game_dirty:
+            self.appendStateGame(json)
+            return
+
+    def appendStateGame(self, json: dict) -> None:
+        self.__game_dirty = False
         json['playerNames'] = self.list_player_names
     
-    def button_C(self):
-        print('button_C')
+    def appendStateBoard(self, json: dict) -> None:
+        self.__board_dirty = False
+    
+    def button_G2(self):
+        print('button_G2')
+        self.game.setPlayerCount(2)
+
+    def button_G4(self):
+        print('button_G4')
+        self.game.setPlayerCount(4)
+
+    def button_G6(self):
+        print('button_G6')
+        self.game.setPlayerCount(6)
 
     def button_R(self):
         print('button_R')
@@ -60,17 +99,20 @@ class GameState:
         print('button_6')
 
 class Game:
-    def __init__(self, dgc: dog_constants.DogGameConstants):
-        self.setPlayerCount(2)
+    def __init__(self):
+        self.dgc = dog_constants.DOG_GAME_CONSTANTS_4
+        self.__gameState = GameState(self)
+        self.__gameState.boardDirty()
 
-    def setPlayerCount(self, playerCount=2):
+    def setPlayerCount(self, playerCount):
         def getDgc():
             for dgc in dog_constants.LIST_DOG_GAME_CONSTANTS:
                 if dgc.PLAYER_COUNT == playerCount:
                     return dgc
             return dog_constants.DOG_GAME_CONSTANTS_2
+
         self.dgc = getDgc()
-        self.__gameState = GameState(self, self.dgc)
+        self.__gameState.boardDirty()
 
     def event(self, json: str) -> typing.Optional[str]:
         return self.__gameState.event(json)

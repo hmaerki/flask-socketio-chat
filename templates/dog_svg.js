@@ -30,8 +30,10 @@ board.attr({
 
 var name_click = function() {
   name = window.prompt("Name:", "...");
-  var msg = { event: 'newName', idx: parseInt(this.node.id), name: name};
-  DogApp.socket.emit("event", msg);
+  if (name) {
+    var msg = { event: 'newName', idx: parseInt(this.node.id), name: name};
+    DogApp.socket.emit("event", msg);
+  }
 }
 
 for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) { 
@@ -47,14 +49,19 @@ for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
 }
 
 var button_click = function() {
-  var msg = { event: 'buttonPressed', label: this.node.textContent};
-  console.log(msg)
+  var label = this.node.textContent
+  if (label === 'R') {
+    DogApp.playerIndex += 1
+    var angle = DogApp.playerIndex*360.0/{{game.dgc.PLAYER_COUNT}}
+    groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
+    return;
+  }
+  var msg = { event: 'buttonPressed', label: label};
   DogApp.socket.emit("event", msg);
 }
 
-const buttons = ["C", "R", "2", "3", "4", "5", "6"]
+const buttons = ["G2", "G4", "G6", "C", "R", "2", "3", "4", "5", "6"]
 buttons.forEach(function (text, i) {
-  console.log(text, i);
   textButton = groupBoard.text(-120,90-i*12, text)
   textButton.attr({
     fontSize: '10px',
