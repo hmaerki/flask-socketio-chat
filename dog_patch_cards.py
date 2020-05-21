@@ -15,18 +15,33 @@ class CardsPatcher(xml.sax.saxutils.XMLFilterBase):
         parent = xml.sax.make_parser()
         super().__init__(parent)
         self.__dbc = dbc
+        self.__rect = None
 
     def startElement(self, name, attrs):
         if name == 'svg':
             card_width = self.__dbc.CARD_SIZE.real
             card_height = self.__dbc.CARD_SIZE.imag
             attrs = {key:value for key, value in attrs.items()}
-            attrs['height'] = str(card_height)
-            attrs['width'] = str(card_width)
-            attrs['x'] = str(card_width/2)
-            attrs['y'] = str(card_height/2)
+            attrs['height'] = f'{card_height}'
+            attrs['width'] = f'{card_width}'
+            attrs['x'] = f'{-card_width/2}'
+            attrs['y'] = f'{-card_height/2}'
+
+        if name == 'rect':
+            self.__rect = {key:value for key, value in attrs.items()}
 
         super().startElement(name, attrs)
+
+    def endElement(self, name):
+        if name == 'svg':
+            assert self.__rect is not None
+            self.__rect['fill'] = 'lightgray'
+            self.__rect['opacity'] = '0.0'
+            self.__rect['id'] = 'mask'
+            super().startElement('rect', self.__rect)
+            super().endElement('rect')
+
+        super().endElement(name)
 
     @classmethod
     def __convert_cards_for_board(cls, dbc: dog_constants.DogBoardConstants):

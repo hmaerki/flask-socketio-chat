@@ -55,8 +55,8 @@
         d = Math.abs(x)+Math.abs(y)
         opacity = 0.05*(d-25)
       }
-      var rect = this.select('rect.cardMaskClass')
-      rect.attr({ opacity: opacity })
+      var cardMask = this.select('rect#mask')
+      cardMask.attr({ opacity: opacity })
     }
     var start = function() {
         this.data('origTransform', this.transform().local );
@@ -66,24 +66,11 @@
     }
 
     // http://svg.dabbles.info/snaptut-load-animate
-    // var card = Snap.load("/static/cards/103.svg", function(frag) {
-    // var card = Snap.load("/static/board4/cards/6/joker.svg", function(fragCard) {
-    // var card = Snap.load("/static/board4/cards/2/2C.svg", function(fragCard) {
+
       var cardname = "/static/board4/cards/2/2C.svg";
       var cardname = "/static/board4/cards/6/joker.svg";
       // var cardname = "/static/boardori/cards/6/joker.svg";
     var card = Snap.load(cardname, function(fragCard) {
-      // var cardRect = fragCard.node.lastElementChild
-
-      // var cardSvg = fragCard.select('svg')
-      // var cardRect = fragCard.select('rect')
-      // cardMask = cardRect.clone()
-      // cardMask.attr({ class:'cardMaskClass', fill: 'lightgray', opacity: 0.0 })
-      // cardSvg.append(cardMask)
-
-      // var shadow = cardSvg.filter(Snap.filter.shadow(10, 20, 0.5));
-      // cardSvg.attr({ filter: shadow });
-
       groupCard = groupBoard.g()
       groupCard.append(fragCard)
       groupCard.drag(move, start, stop);
