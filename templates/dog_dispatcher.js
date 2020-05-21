@@ -36,7 +36,7 @@ $(document).ready(function () {
   
     var card = json['card']
     if (card) {
-      placeCard(card[0], card[1].slice(0, 3))
+      placeCard(card[0], card[1])
       // var id = card[0]
       // var x = card[1]
       // var y = card[2]
@@ -48,8 +48,22 @@ $(document).ready(function () {
 
     var cards = json['cards']
     if (cards) {
-      cards.forEach(function (card, id) {
-        placeCard(id, card)
+      cards.forEach(function (card, i) {
+        var angle = card[0]
+        var x = card[1]
+        var y = card[2]
+        var filebase = card[3]
+        var descriptionI18N = card[4]
+
+        var groupCard = DogApp.players_cards[i]
+        var svgCard = groupCard.image("/static/board{{ game.dbc.BOARD_ID }}/cards/" + filebase + ".svg");
+        svgCard.attr({
+          class: "set",
+        });
+        groupCard.attr({'transform': 't'+x+','+y+'r'+angle+',0,0'});
+
+        // placeCard(id, card.slice(0, 3))
+
         /*
         var angle = card[0]
         var x = card[1]
@@ -135,7 +149,7 @@ $(document).ready(function () {
   });
 
   DogApp.socket.on('message', function (msg) {
-    console.log('Received "message": ' + msg);
+    // console.log('Received "message": ' + msg);
     var i = msg.indexOf(':');
     var method = msg.slice(0, i)
     var text = msg.slice(i + 1)

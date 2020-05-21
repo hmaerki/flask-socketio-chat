@@ -31,20 +31,16 @@ class PlayersCard:
         self.__card = card
 
     @property
-    def url(self):
-        return f'/static/{self.__gameState.dbc.BOARD_ID}/cards/{self.__card.filename}'
-
-    @property
     def jsonMove(self):
         return (int(self.__angle), int(self.__x), int(self.__y))
 
     @property
     def jsonAll(self):
-        return (int(self.__angle), int(self.__x), int(self.__y), self.url, self.__card.descriptionI18N)
+        return (int(self.__angle), int(self.__x), int(self.__y), self.__card.filebase, self.__card.descriptionI18N)
 
 class GameState:
     def __init__(self, game: 'Game'):
-        self.__cards = dog_cards.Cards()
+        self.cards = dog_cards.Cards()
         self.game = game
         self.reset()
         self.__game_dirty = False
@@ -58,6 +54,15 @@ class GameState:
     def dbc(self) -> dog_constants.DogGameConstants:
         return self.game.dbc
 
+    # @property
+    # def card_urls(self) -> list:
+    #     return [f'/static/{self.dbc.BOARD_ID}/cards/{card.filename}' for card in self.__cards.all]
+
+    @property
+    def card_filebases(self) -> list:
+        # {% for card in game.gameState.cards.all %}{{card.filebase}};{% endfor %}
+        return ';'.join([card.filebase for card in self.cards.all])
+
     def reset(self) -> None:
         self.__game_dirty = True
         self.__board_dirty = True
@@ -70,11 +75,11 @@ class GameState:
                 angleDeg = 360.0 * playerIndex / self.dgc.PLAYER_COUNT
                 playerAngle = 2 * math.pi * playerIndex / self.dgc.PLAYER_COUNT
                 for cardIndex, cardCenter in enumerate(self.dbc.LIST_CARD_CENTER):
-                    id = playerIndex* self.dgc.PLAYER_COUNT + cardIndex
+                    id = playerIndex*self.dgc.PLAYER_COUNT + cardIndex
                     cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
                     x_initial = cardCenterRotated.real
                     y_initial = cardCenterRotated.imag
-                    card = self.__cards.pop_card()
+                    card = self.cards.pop_card()
                     yield PlayersCard(gameState=self, id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial, card=card)
 
         self.__list_cards = list(generator())
@@ -162,8 +167,8 @@ class GameState:
 class Game:
     def __init__(self):
         self.dgc = dog_constants.DOG_GAME_CONSTANTS_4
-        self.__gameState = GameState(self)
-        self.__gameState.boardDirty()
+        self.gameState = GameState(self)
+        self.gameState.boardDirty()
 
     def setPlayerCount(self, playerCount):
         def getDgc():
@@ -173,43 +178,48 @@ class Game:
             return dog_constants.DOG_GAME_CONSTANTS_2
 
         self.dgc = getDgc()
-        self.__gameState.boardDirty()
+        self.gameState.boardDirty()
 
     def event(self, json: str) -> typing.Optional[str]:
-        return self.__gameState.event(json)
+        return self.gameState.event(json)
 
     def appendState(self, json: dict) -> None:
-        self.__gameState.appendState(json)
+        self.gameState.appendState(json)
 
     def moveCard(self, id:int, x:int, y:int) -> dict:
-        return self.__gameState.moveCard(id=id, x=x, y=y)
+        return self.gameState.moveCard(id=id, x=x, y=y)
 
     def getAssistance(self):
-        return self.__gameState.getAssistance()
+        return self.gameState.getAssistance()
 
     def getPlayer(self, index: int) -> 'PlayerState':
-        return self.__gameState.getPlayer(index)
+        return self.gameState.getPlayer(index)
     
     def setMarble(self, dictPosition: dict) -> None:
-        self.__gameState.setMarble(dictPosition)
+        self.gameState.setMarble(dictPosition)
 
     @property
     def dbc(self) -> dog_constants.DogBoardConstants:
         return self.dgc.dbc
 
-    @property
-    def template_params(self):
-        # playerIndexNext = (playerIndex+1)%game.player_count
-        playerIndex = 2
-        playerIndexNext = 42
-        rotateUrl = 'xy' # f'{flask.request.url_root}{playerIndexNext}'
-        params = dict(
-            game = self,
-            playerCount = self.dgc.PLAYER_COUNT,
-            playerIndex = playerIndex,
-            rotateUrl = rotateUrl
-        )
-        return params
+    # @property
+    # def card_urls_as_javascript(self) -> str:
+    #     l = [f"'{url}'" for url in self.__gameState.card_urls]
+    #     return f'[{",".join(l)}]'
+
+    # @property
+    # def template_params(self):
+    #     # playerIndexNext = (playerIndex+1)%game.player_count
+    #     playerIndex = 2
+    #     playerIndexNext = 42
+    #     rotateUrl = 'xy' # f'{flask.request.url_root}{playerIndexNext}'
+    #     params = dict(
+    #         game = self,
+    #         playerCount = self.dgc.PLAYER_COUNT,
+    #         playerIndex = playerIndex,
+    #         rotateUrl = rotateUrl
+    #     )
+    #     return params
 
 
 if __name__ == '__main__':

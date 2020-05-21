@@ -28,6 +28,21 @@ board.attr({
 })
 
 //
+// Load all cards
+//
+// DogApp.card_filebases.split(';').forEach(function (filebase, i) {
+//   var svgCard = groupBoard.image("/static/board{{ game.dbc.BOARD_ID }}/cards/" + filebase + ".svg");
+//   svgCard.attr({
+//     class: "set",
+//     x: 2*i,
+//     y: 1*i
+//   });
+//   svgCard.node.id="set"+i
+//   DogApp.card_array[i] = svgCard
+// });
+
+
+//
 // The cards
 //
 var card_drag_move = function (dx, dy, mouseX, mouseY) {
@@ -45,7 +60,7 @@ var card_drag_move = function (dx, dy, mouseX, mouseY) {
   cy = DogApp.start_card_drag_y + dy2;
 
   var msg = [parseInt(this.node.id), cx|0, cy|0]
-  console.log(msg)
+  // console.log(msg)
   DogApp.socket.emit("moveCard", msg);
 }
 
@@ -60,22 +75,50 @@ var card_drag_stop = function () {
   console.log('finished dragging');
 }
 
-for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
-  for (var c = 0; c < 6; c++) {
-    var create_card = function(id) {
-      var url = "/static/board4/cards/2/2C.svg";
-      var card = Snap.load(url, function(fragCard) {
-        groupCard = groupBoard.g()
-        groupCard.attr({'transform': 't0,0r0,0'})
-        console.log('card:'+id)
-        groupCard.node.id = id
-        groupCard.append(fragCard)
-        groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
-      });
-    }
-    create_card(i*6+c+'card')
-  }
+// for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
+//   for (var c = 0; c < 6; c++) {
+//     var create_card = function(id) {
+//       var url = "/static/board4/cards/joker.svg";
+//       var card = Snap.load(url, function(fragCard) {
+//         groupCard = groupBoard.g()
+//         groupCard.attr({'transform': 't0,0r0,0'})
+//         console.log('card:'+id)
+//         groupCard.node.id = id
+//         groupCard.append(fragCard)
+//         groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
+//       });
+//     }
+//     create_card(i*6+c+'card')
+//   }
+// }
+
+for (var i = 0; i < 6*{{ game.dgc.PLAYER_COUNT }}; i++) {
+  id = i+'card'
+  groupCard = groupBoard.g()
+  groupCard.attr({'transform': 't0,0r0,0'})
+  groupCard.node.id = id
+  groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
+  DogApp.players_cards[i] = groupCard
 }
+
+// DogApp.card_filebases.split(';').forEach(function (filebase, i) {
+//   id = i+'card'
+//   groupCard = groupBoard.g()
+//   groupCard.attr({'transform': 't0,0r0,0'})
+//   // console.log('card:'+id)
+//   groupCard.node.id = id
+//   groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
+// });
+
+
+// for (var i = 0; i < {{game.gameState.cards.count}}; i++) {
+//   id = i+'card'
+//   groupCard = groupBoard.g()
+//   groupCard.attr({'transform': 't0,0r0,0'})
+//   // console.log('card:'+id)
+//   groupCard.node.id = id
+//   groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
+// }
 
 var name_click = function() {
   name = window.prompt("Name:", "...");

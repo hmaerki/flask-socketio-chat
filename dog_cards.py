@@ -1,4 +1,4 @@
-COLOURS = ('', 'C', 'D', 'H', 'S')
+COLOURS = ('C', 'D', 'H', 'S')
 
 LIST_4_COLOURS = (
     # https://docs.google.com/spreadsheets/d/1fnAL9Csg0xfkZqHPyxq1r5kL7MLX200DlCBzDXKeito/edit?usp=sharing
@@ -21,7 +21,7 @@ JOKER = dict(id="joker", german=dict(name="Joker", description="Karte nach Wunsc
 
 class Card:
     def __init__(self, dict_card: dict, color: str):
-        assert color in COLOURS
+        assert color in ('',) + COLOURS
         self.__dict_card = dict_card
         self.__color = color
 
@@ -30,8 +30,8 @@ class Card:
         return self.__dict_card['id']
 
     @property
-    def filename(self) -> str:
-        return f'{self.id}{self.__color}.svg'
+    def filebase(self) -> str:
+        return f'{self.id}{self.__color}'
 
     @property
     def nameI18N(self) -> str:
@@ -57,6 +57,10 @@ class Cards:
 
     def __init__(self):
         self.__list_cards = Cards.all_cards()
+
+    @property
+    def all(self) -> list:
+        return self.__list_cards
 
     @property
     def count(self):
