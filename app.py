@@ -75,17 +75,9 @@ def handleMove(json: dict):
     game.setMarble(json)
     socketio.send([json], json=True, broadcast=True)
 
-
-def index_inner(playerIndex:int):
-    return flask.render_template('index.html', game=game)
-
 @app.route('/')
 def index():
-    return index_inner(0)
-
-@app.route('/<int:playerIndex>')
-def index_player(playerIndex):
-    return index_inner(playerIndex)
+    return flask.render_template('index.html', game=game)
 
 @app.route('/templates/<string:filename>')
 def templates(filename: str):

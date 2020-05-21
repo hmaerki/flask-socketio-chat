@@ -33,8 +33,16 @@ class GameState:
 
 class Game:
     def __init__(self, dgc: dog_constants.DogGameConstants):
-        self.dgc = dgc
-        self.__gameState = GameState(self, dgc)
+        self.setPlayerCount(2)
+
+    def setPlayerCount(self, playerCount=2):
+        def getDgc():
+            for dgc in dog_constants.LIST_DOG_GAME_CONSTANTS:
+                if dgc.PLAYER_COUNT == playerCount:
+                    return dgc
+            return dog_constants.DOG_GAME_CONSTANTS_2
+        self.dgc = getDgc()
+        self.__gameState = GameState(self, self.dgc)
 
     def event(self, json: str) -> typing.Optional[str]:
         return self.__gameState.event(json)
