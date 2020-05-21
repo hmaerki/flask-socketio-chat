@@ -20,12 +20,12 @@
 <body>
   <script type="text/javascript">
     var DogApp = {
-      playerIndex: {{ playerIndex }},
-      playerCount: {{ playerCount }},
-      rotateUrl: "{{ rotateUrl }}"
+      playerIndex: 0,
+      // playerCount:  playerCount ,
+      // rotateUrl: " rotateUrl "
     };
   </script>
-  <script src="static/js/dog_dispatcher.js"></script>
+  <script src="templates/dog_dispatcher.js"></script>
 
   <div class="body_top">
       <p id="assistance">Spiel starten...</p>
@@ -45,52 +45,10 @@
       -->
   </div>
   <div class="body_bottom">
-    <p id="card_in_center">...</p>
-    <table style="width: 95%">
-      <tr>
-        <td><p id="player{{ playerIndex }}_card" name="0">...</p></td>
-        <td><p id="player{{ playerIndex }}_card" name="1">...</p></td>
-        <td><p id="player{{ playerIndex }}_card" name="2">...</p></td>
-        <td><p id="player{{ playerIndex }}_card" name="3">...</p></td>
-        <td><p id="player{{ playerIndex }}_card" name="4">...</p></td>
-        <td><p id="player{{ playerIndex }}_card" name="5">...</p></td>
-      </tr>
-      <tr>
-        <td><button id="player{{ playerIndex }}_playCard" name="0" disabled>Spielen</button></td>
-        <td><button id="player{{ playerIndex }}_playCard" name="1" disabled>Spielen</button></td>
-        <td><button id="player{{ playerIndex }}_playCard" name="2" disabled>Spielen</button></td>
-        <td><button id="player{{ playerIndex }}_playCard" name="3" disabled>Spielen</button></td>
-        <td><button id="player{{ playerIndex }}_playCard" name="4" disabled>Spielen</button></td>
-        <td><button id="player{{ playerIndex }}_playCard" name="5" disabled>Spielen</button></td>
-      </tr>
-
-      <tr>
-        <td><button id="player{{ playerIndex }}_changeCard" name="0" disabled>Tauschen</button></td>
-        <td><button id="player{{ playerIndex }}_changeCard" name="1" disabled>Tauschen</button></td>
-        <td><button id="player{{ playerIndex }}_changeCard" name="2" disabled>Tauschen</button></td>
-        <td><button id="player{{ playerIndex }}_changeCard" name="3" disabled>Tauschen</button></td>
-        <td><button id="player{{ playerIndex }}_changeCard" name="4" disabled>Tauschen</button></td>
-        <td><button id="player{{ playerIndex }}_changeCard" name="5" disabled>Tauschen</button></td>
-      </tr>
-    </table>
-    <table style="width: 95%">
-      <tr>
-        <td>
-          <form>
-            <p>
-              <input type="text" id="player{{ playerIndex }}_textfield_name" value="D. T." />
-              <button id="setName">Name setzen</button>
-            </p>
-          </form>
-        </td>
-        <td><button id="rotateBoard">Spielbrett drehen</button></td>
-        <td><button id="newGame">Neues Spiel</button></td>
-      </tr>
-    </table>
   </div>
   <script src="static/js/snap.svg.js"></script>
 
-  <script src="static/js/dog_svg.js"></script>
+  <script src="templates/dog_svg.js"></script>
 
 </body>
 

@@ -21,15 +21,37 @@ groupBoard = snap.g()
 // })
 
 var circleMask = groupBoard.circle(0, 0, 100).attr({ fill: 'white' });
-var board = groupBoard.image("static/img/" + DogApp.playerCount + "/board.jpg", -100, -100, 200, 200);
+var board = groupBoard.image("static/board{{ game.dbc.BOARD_ID }}/board.jpg", -100, -100, 200, 200);
 board.attr({
   class: "board",
   mask: circleMask
 })
 
-var angle = DogApp.playerIndex * 360 / DogApp.playerCount
+var name_click = function() {
+  name = window.prompt("Name:", "...");
+  // TODO: Send name to server
+  var msg = { event: 'newName', idx: parseInt(this.node.id), name: name};
+  DogApp.socket.emit("event", msg);
+}
+
+
+for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) { 
+  textPlayer = groupBoard.text(0,70, 'Player ' + i)
+  textPlayer.attr({
+    fontSize: '10px',
+    opacity: 1.0,
+    "text-anchor": "middle"
+  });
+  textPlayer.node.id = i+'name'
+  var angle = i*360.0/{{game.dgc.PLAYER_COUNT}}
+  textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 5000, mina.bounce );
+  textPlayer.click(name_click)
+}
+
+
+// var angle = DogApp.playerIndex * 360 / DogApp.playerCount
 // groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
-groupBoard.attr({transform: 'r' + angle + ',0,0'});
+// groupBoard.attr({transform: 'r' + angle + ',0,0'});
 
 
 //

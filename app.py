@@ -2,14 +2,17 @@
 import logging
 
 import eventlet
+import jinja2
 import flask
 import flask_socketio
 
 import dog_game
+import dog_constants
 import dog_html
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
+app.jinja_env.undefined = jinja2.StrictUndefined
 
 # TODO: Does not work
 '''
@@ -29,7 +32,7 @@ params = dict(
 # socketio = flask_socketio.SocketIO(app, ping_timeout=20, ping_interval=10)
 socketio = flask_socketio.SocketIO(app, **params)
 
-game = dog_game.Game()
+game = dog_game.Game(dog_constants.DOG_GAME_CONSTANTS_2)
 
 @socketio.on('message')
 def handleMessage(msg):
@@ -40,26 +43,26 @@ def handleMessage(msg):
 def handleEvent(json):
     print(f'Json: {json}\n')
 
-    for tag in ('player', 'card'):
-        text = json.get(tag, None)
-        if text is None:
-            continue
-        if text == '':
-            del json[tag]
-            continue
-        json[tag] = int(text)
+    # for tag in ('player', 'card'):
+    #     text = json.get(tag, None)
+    #     if text is None:
+    #         continue
+    #     if text == '':
+    #         del json[tag]
+    #         continue
+    #     json[tag] = int(text)
 
-    str_event = json.get('event', None)
-    if str_event is not None:
-        match_event = dog_html.ReEvent.search(str_event)
-        if match_event is not None:
-            # player5_changeCard
-            json['event'] = match_event.event
-            json['player'] = int(match_event.player)
+    # str_event = json.get('event', None)
+    # if str_event is not None:
+    #     match_event = dog_html.ReEvent.search(str_event)
+    #     if match_event is not None:
+    #         # player5_changeCard
+    #         json['event'] = match_event.event
+    #         json['player'] = int(match_event.player)
 
     try:
         game.event(json)
-        json_command = []
+        json_command = {}
         game.appendState(json_command)
         socketio.send(json_command, json=True, broadcast=True)
     except Exception as e:
@@ -74,14 +77,7 @@ def handleMove(json: dict):
 
 
 def index_inner(playerIndex:int):
-    playerIndexNext = (playerIndex+1)%game.player_count
-    rotateUrl = f'{flask.request.url_root}{playerIndexNext}'
-    params = dict(
-        playerCount = game.player_count,
-        playerIndex = playerIndex,
-        rotateUrl = rotateUrl
-    )
-    return flask.render_template('index.html', **params)
+    return flask.render_template('index.html', game=game)
 
 @app.route('/')
 def index():
@@ -90,6 +86,10 @@ def index():
 @app.route('/<int:playerIndex>')
 def index_player(playerIndex):
     return index_inner(playerIndex)
+
+@app.route('/templates/<string:filename>')
+def templates(filename: str):
+    return flask.render_template(filename, game=game)
 
 @app.route('/favicon.ico')
 def favicon():

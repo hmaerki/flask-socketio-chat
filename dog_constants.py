@@ -26,27 +26,25 @@ class DogBoardConstants:
     def BOARD_DIRECTORY_RELATIVE(self):
         return DIRECTORY_OF_THIS_FILE / 'static' / f'board{self.BOARD_ID}'
 
-
 class DogGameConstants:
-    def __init__(self, player_count: int, dbc_module: 'module'):
+    def __init__(self, player_count: int, dbc_module: 'module', player_names_default: list):
         assert player_count in LIST_PLAYER_COUNT
         
         self.PLAYER_COUNT = player_count
-        self.dbc_module = DogBoardConstants(dbc_module)
-        self.dbc_module = DogBoardConstants(dbc_module)
+        self.PLAYER_NAMES_DEFAULTS = player_names_default
+        self.dbc = DogBoardConstants(dbc_module)
 
         # Copy from globals
         self.BOARD_CENTER = BOARD_CENTER
         self.BOARD_DIAMETER = BOARD_DIAMETER
 
-
 DOG_BOARD_CONSTANTS_4 = DogBoardConstants(dog_constants_4)
 DOG_BOARD_CONSTANTS_6 = DogBoardConstants(dog_constants_6)
 LIST_DOG_BOARD_CONSTANTS = (DOG_BOARD_CONSTANTS_4, DOG_BOARD_CONSTANTS_6)
 
-DOG_GAME_CONSTANTS_2 = DogGameConstants(2, DOG_BOARD_CONSTANTS_4)
-DOG_GAME_CONSTANTS_4 = DogGameConstants(4, DOG_BOARD_CONSTANTS_4)
-DOG_GAME_CONSTANTS_6 = DogGameConstants(6, DOG_BOARD_CONSTANTS_4)
+DOG_GAME_CONSTANTS_2 = DogGameConstants(2, DOG_BOARD_CONSTANTS_4, ('Blue', 'Green'))
+DOG_GAME_CONSTANTS_4 = DogGameConstants(4, DOG_BOARD_CONSTANTS_4, ('Blue', 'Red', 'Green', 'Yellow'))
+DOG_GAME_CONSTANTS_6 = DogGameConstants(6, DOG_BOARD_CONSTANTS_6, ('Green', 'Black', 'Yellow', 'Blue', 'White', 'Red'))
 LIST_DOG_GAME_CONSTANTS = (DOG_GAME_CONSTANTS_2, DOG_GAME_CONSTANTS_4, DOG_GAME_CONSTANTS_6)
 
 

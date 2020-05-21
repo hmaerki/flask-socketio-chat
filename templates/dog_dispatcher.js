@@ -8,6 +8,16 @@ $(document).ready(function () {
   });
 
   DogApp.socket.on('json', function (json) {
+
+    var playerNames = json['playerNames']
+    if (playerNames) {
+      for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
+        var svg_element = $('text#'+i+'name')
+        svg_element.text(playerNames[i])
+      }
+      return
+    }
+
       // console.log('Received "json": ' + JSON.stringify(json));
     for (var i = 0; i < json.length; i++) { 
       var command = json[i]
