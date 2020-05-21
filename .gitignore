@@ -1,3 +1,6 @@
+static/board4/cards/**
+static/board6/cards/**
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 .mypy_cache/

@@ -6,15 +6,15 @@ import dog_constants
 LIST_NUMBER_CARDS = ('2', '6')
 
 DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent
-DIRECTORY_CARDS_ORI = DIRECTORY_OF_THIS_FILE / 'static' / 'cards_ori'
+DIRECTORY_CARDS_ORI = DIRECTORY_OF_THIS_FILE / 'static' / 'boardori' / 'cards'
 
 class CardsPatcher:
     def __init__(self, dbc: dog_constants.DogBoardConstants):
         self.__dbc = dbc
 
     def __convert_svg(self, tree):
-        card_height = self.__dbc.CARD_SIZE.real
-        card_width = self.__dbc.CARD_SIZE.imag
+        card_width = self.__dbc.CARD_SIZE.real
+        card_height = self.__dbc.CARD_SIZE.imag
         xml_declaration = tree.find(".")
         xml_declaration.attrib['height'] = str(card_height)
         xml_declaration.attrib['width'] = str(card_width)
