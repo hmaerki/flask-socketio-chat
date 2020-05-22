@@ -26,6 +26,10 @@ class CardsPatcher(xml.sax.saxutils.XMLFilterBase):
 
         if name == 'rect':
             self.__rect = {key:value for key, value in attrs.items()}
+            self.__rect['stroke'] = 'blue'
+            self.__rect['stroke-width'] = '0'
+            super().startElement(name, self.__rect)
+            return
 
         super().startElement(name, attrs)
 
