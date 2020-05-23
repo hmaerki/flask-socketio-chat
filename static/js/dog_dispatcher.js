@@ -3,7 +3,7 @@ $(document).ready(function () {
   DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
 
   DogApp.socket.on('connect', function () {
-    var msg = { player: DogApp.playerIndex, event: 'browserConnected' };
+    var msg = { player: DogApp.playerIndex, room: DogApp.ROOM, event: 'browserConnected' };
     DogApp.socket.emit('event', msg);
   });
 
@@ -56,7 +56,7 @@ $(document).ready(function () {
         var descriptionI18N = card[4]
 
         var groupCard = DogApp.players_cards[i]
-        var svgCard = groupCard.image("/static/board{{ game.dbc.BOARD_ID }}/cards/" + filebase + ".svg");
+        var svgCard = groupCard.image("/static/board" + DogApp.BOARD_ID + "/cards/" + filebase + ".svg");
         svgCard.attr({
           class: "set",
         });

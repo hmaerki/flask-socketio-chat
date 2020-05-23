@@ -4,7 +4,7 @@ import xml.sax.xmlreader
 import xml.sax.saxutils
 import dog_constants
 
-DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent
+DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent.absolute()
 DIRECTORY_CARDS_ORI = DIRECTORY_OF_THIS_FILE / 'static' / 'boardori' / 'cards'
 
 class CardsPatcher(xml.sax.saxutils.XMLFilterBase):

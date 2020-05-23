@@ -5,3 +5,9 @@ It covers a simple SocketIO app in Flask.
 
 docker build -t dog .
 docker run --rm -it -p 5000:5000 dog
+
+form
+  input: game-name
+  players: 2,4,6
+  submit: rediect www.dogspiel.ch:5000/2/name
+

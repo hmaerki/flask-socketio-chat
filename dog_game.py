@@ -41,9 +41,10 @@ class PlayersCard:
         return (int(self.__angle), int(self.__x), int(self.__y), self.__card.filebase, self.__card.descriptionI18N)
 
 class GameState:
-    def __init__(self, game: 'Game'):
+    def __init__(self, game: 'Game', room: str):
         self.cards = dog_cards.Cards()
         self.game = game
+        self.room = room
         self.reset()
         self.__game_dirty = False
         self.__board_dirty = False
@@ -134,18 +135,6 @@ class GameState:
 
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False
-    
-    def button_G2(self):
-        print('button_G2')
-        self.game.setPlayerCount(2)
-
-    def button_G4(self):
-        print('button_G4')
-        self.game.setPlayerCount(4)
-
-    def button_G6(self):
-        print('button_G6')
-        self.game.setPlayerCount(6)
 
     def button_R(self):
         print('button_R')
@@ -166,19 +155,14 @@ class GameState:
         print('button_6')
 
 class Game:
-    def __init__(self):
-        self.dgc = dog_constants.DOG_GAME_CONSTANTS_4
-        self.gameState = GameState(self)
-        self.gameState.boardDirty()
-
-    def setPlayerCount(self, playerCount):
-        def getDgc():
+    def __init__(self, players: int, room: str):
+        def getDgc(playerCount):
             for dgc in dog_constants.LIST_DOG_GAME_CONSTANTS:
                 if dgc.PLAYER_COUNT == playerCount:
                     return dgc
             return dog_constants.DOG_GAME_CONSTANTS_2
-
-        self.dgc = getDgc()
+        self.dgc = getDgc(players)
+        self.gameState = GameState(self, room)
         self.gameState.boardDirty()
 
     def event(self, json: str) -> typing.Optional[str]:
@@ -202,6 +186,10 @@ class Game:
     @property
     def dbc(self) -> dog_constants.DogBoardConstants:
         return self.dgc.dbc
+
+    @property
+    def room(self) -> str:
+        return self.gameState.room
 
     # @property
     # def card_urls_as_javascript(self) -> str:

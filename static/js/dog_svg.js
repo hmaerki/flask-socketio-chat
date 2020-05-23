@@ -21,7 +21,7 @@ groupBoard.attr({transform: 'r0,0,0'});
 // The board
 //
 var circleMask = groupBoard.circle(0, 0, 100).attr({ fill: 'white' });
-var board = groupBoard.image("static/board{{ game.dbc.BOARD_ID }}/board.jpg", -100, -100, 200, 200);
+var board = groupBoard.image("/static/board" + DogApp.BOARD_ID + "/board.jpg", -100, -100, 200, 200);
 board.attr({
   class: "board",
   mask: circleMask
@@ -31,7 +31,7 @@ board.attr({
 // Load all cards
 //
 // DogApp.card_filebases.split(';').forEach(function (filebase, i) {
-//   var svgCard = groupBoard.image("/static/board{{ game.dbc.BOARD_ID }}/cards/" + filebase + ".svg");
+//   var svgCard = groupBoard.image("/static/board" + DogApp.BOARD_ID + "/cards/" + filebase + ".svg");
 //   svgCard.attr({
 //     class: "set",
 //     x: 2*i,
@@ -59,7 +59,7 @@ var card_drag_move = function (dx, dy, mouseX, mouseY) {
   cx = DogApp.start_card_drag_x + dx2;
   cy = DogApp.start_card_drag_y + dy2;
 
-  var msg = [parseInt(this.node.id), cx|0, cy|0]
+  var msg = {room: DogApp.ROOM, card: [parseInt(this.node.id), cx|0, cy|0]}
   // console.log(msg)
   DogApp.socket.emit("moveCard", msg);
 }
@@ -75,7 +75,7 @@ var card_drag_stop = function () {
   console.log('finished dragging');
 }
 
-// for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
+// for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
 //   for (var c = 0; c < 6; c++) {
 //     var create_card = function(id) {
 //       var url = "/static/board4/cards/joker.svg";
@@ -92,7 +92,7 @@ var card_drag_stop = function () {
 //   }
 // }
 
-for (var i = 0; i < 6*{{ game.dgc.PLAYER_COUNT }}; i++) {
+for (var i = 0; i < 6*DogApp.PLAYER_COUNT; i++) {
   id = i+'card'
   groupCard = groupBoard.g()
   groupCard.attr({'transform': 't0,0r0,0'})
@@ -128,14 +128,14 @@ var name_click = function() {
   }
 }
 
-for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
+for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
   textPlayer = groupBoard.text(0,70, 'Player ' + i)
   textPlayer.attr({
     fontSize: '10px',
     "text-anchor": "middle"
   });
   textPlayer.node.id = i+'name'
-  var angle = i*360.0/{{game.dgc.PLAYER_COUNT}}
+  var angle = i*360.0/DogApp.PLAYER_COUNT
   textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
   textPlayer.click(name_click)
 }
@@ -143,8 +143,8 @@ for (var i = 0; i < {{ game.dgc.PLAYER_COUNT }}; i++) {
 var button_click = function() {
   var label = this.node.textContent
   if (label === 'R') {
-    DogApp.playerIndex = (1+DogApp.playerIndex) % {{game.dgc.PLAYER_COUNT}}
-    var angle = DogApp.playerIndex*360.0/{{game.dgc.PLAYER_COUNT}}
+    DogApp.playerIndex = (1+DogApp.playerIndex) % DogApp.PLAYER_COUNT
+    var angle = DogApp.playerIndex*360.0/DogApp.PLAYER_COUNT
     groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce );
     return;
   }
@@ -157,7 +157,7 @@ var button_click = function() {
   }
 }
 
-const buttons = ["G2", "G4", "G6", "C", "R", "2", "3", "4", "5", "6"]
+const buttons = ["C", "R", "2", "3", "4", "5", "6"]
 buttons.forEach(function (text, i) {
   textButton = snap.text(-120,90-i*12, text)
   textButton.attr({
@@ -215,7 +215,7 @@ var stop = function () {
 }
 
 for (i=0; i<4*DogApp.playerCount; i++) {
-  var circleMarble = groupBoard.image("static/img/" + DogApp.playerCount + "/marble" + (10+i) + ".png", 0, 0, 8, 8);
+  var circleMarble = groupBoard.image("/static/img/" + DogApp.playerCount + "/marble" + (10+i) + ".png", 0, 0, 8, 8);
   circleMarble.attr({
     class: "marble",
     x: 2*i,

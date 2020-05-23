@@ -6,8 +6,8 @@ import pathlib
 '''
 Take a jpg image, make everything outside the marble transparent and save it as a png.
 '''
-THIS_DIRECTORY = pathlib.Path(__file__).parent
-for filename in THIS_DIRECTORY.glob('*.jpg'):
+DIRECTORY_OF_THIS_FILE = pathlib.Path(__file__).parent.absolute()
+for filename in DIRECTORY_OF_THIS_FILE.glob('*.jpg'):
   print(filename)
   
   # img = PIL.Image.new('RGBA', size = (100, 100), color = (128, 128, 128, 255))
