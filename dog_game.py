@@ -57,13 +57,8 @@ class GameState:
     def dbc(self) -> dog_constants.DogGameConstants:
         return self.game.dbc
 
-    # @property
-    # def card_urls(self) -> list:
-    #     return [f'/static/{self.dbc.BOARD_ID}/cards/{card.filename}' for card in self.__cards.all]
-
     @property
     def card_filebases(self) -> list:
-        # {% for card in game.gameState.cards.all %}{{card.filebase}};{% endfor %}
         return ';'.join([card.filebase for card in self.cards.all])
 
     def reset(self) -> None:
@@ -72,12 +67,14 @@ class GameState:
         self.list_player_names = list(self.dgc.PLAYER_NAMES_DEFAULTS)
         self.__initializeCards()
 
-    def __initializeCards(self):
+    def __initializeCards(self, cards=0):
         def generator():
             for playerIndex in range(self.dgc.PLAYER_COUNT):
                 angleDeg = 360.0 * playerIndex / self.dgc.PLAYER_COUNT
                 playerAngle = 2 * math.pi * playerIndex / self.dgc.PLAYER_COUNT
                 for cardIndex, cardCenter in enumerate(self.dbc.LIST_CARD_CENTER):
+                    if cardIndex >= cards:
+                        continue
                     id = playerIndex*self.dgc.PLAYER_COUNT + cardIndex
                     cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
                     x_initial = cardCenterRotated.real
@@ -85,6 +82,7 @@ class GameState:
                     card = self.cards.pop_card()
                     yield PlayersCard(gameState=self, id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial, card=card)
 
+        self.cards.shuffle(dog_constants.dogRandom.shuffle)
         self.__list_cards = list(generator())
 
     def boardDirty(self):
@@ -136,23 +134,30 @@ class GameState:
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False
 
-    def button_R(self):
-        print('button_R')
+    def button_C(self):
+        # Clean
+        self.__initializeCards(0)
+        self.gameDirty()
 
     def button_2(self):
-        print('button_2')
+        self.__initializeCards(2)
+        self.gameDirty()
 
     def button_3(self):
-        print('button_3')
+        self.__initializeCards(3)
+        self.gameDirty()
 
     def button_4(self):
-        print('button_4')
+        self.__initializeCards(4)
+        self.gameDirty()
 
     def button_5(self):
-        print('button_5')
+        self.__initializeCards(5)
+        self.gameDirty()
 
     def button_6(self):
-        print('button_6')
+        self.__initializeCards(6)
+        self.gameDirty()
 
 class Game:
     def __init__(self, players: int, room: str):

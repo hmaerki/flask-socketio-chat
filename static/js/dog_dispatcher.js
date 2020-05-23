@@ -37,17 +37,13 @@ $(document).ready(function () {
     var card = json['card']
     if (card) {
       placeCard(card[0], card[1])
-      // var id = card[0]
-      // var x = card[1]
-      // var y = card[2]
-      // var svg_element = $('g#'+id+'card')
-      // svg_element.each(function () {
-      //   this.setAttribute('transform', 'translate('+x+','+y+')');
-      // });
     }
 
     var cards = json['cards']
     if (cards) {
+      // Remove existing cards
+      $('g.card').remove()
+
       cards.forEach(function (card, i) {
         var angle = card[0]
         var x = card[1]
@@ -55,7 +51,12 @@ $(document).ready(function () {
         var filebase = card[3]
         var descriptionI18N = card[4]
 
-        var groupCard = DogApp.players_cards[i]
+        id = i+'card'
+        var groupCard = groupBoard.g()
+        groupCard.node.id = id
+        groupCard.attr({ class:'card' })
+        groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
+
         var svgCard = groupCard.image(
           "/static/img/cards/" + filebase + ".svg",
           -DogApp.CARD_WIDTH/2,
@@ -66,40 +67,11 @@ $(document).ready(function () {
         svgCard.attr({
           class: "set",
         });
-        groupCard.attr({'transform': 't'+x+','+y+'r'+angle+',0,0'});
+        // groupCard.attr({'transform': 't'+x+','+y+'r'+angle+',0,0'});
+        groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout);
 
-        var title = Snap.parse('<title>This is a title 2' + filebase + '</title>');
-        // var rect = groupCard.rect(20,20,40,40);
+        var title = Snap.parse('<title>' + descriptionI18N + '</title>');
         groupCard.append( title );
-        
-
-        // function hoverOver() {
-        //   textBox = svgCard.text( this.getBBox().cx, this.getBBox().cy, 'Hallo');
-        // }
-        
-        // function hoverOut() {
-        //   textBox.remove();
-        // }
-        // svgCard.hover(hoverOver, hoverOut);
-
-        // placeCard(id, card.slice(0, 3))
-
-        /*
-        var angle = card[0]
-        var x = card[1]
-        var y = card[2]
-        // console.log('card: ' + card + ', x: ' + x)
-        var svg_element = $('g#'+index+'card')
-        svg_element.each(function () {
-          // var angle = 30.0
-
-          // this.setAttribute('x', x);
-          // this.setAttribute('y', y);
-          this.setAttribute('transform', 'translate('+x+','+y+') rotate('+angle+' 0 0)');
-          // this.setAttribute('rotate', 30);
-          // this.transform('r'+angle+',0,0');
-        });
-        */
       });
     }
 

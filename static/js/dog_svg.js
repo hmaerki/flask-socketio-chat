@@ -75,85 +75,50 @@ var card_drag_stop = function () {
   console.log('finished dragging');
 }
 
-// for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
-//   for (var c = 0; c < 6; c++) {
-//     var create_card = function(id) {
-//       var url = "/static/board4/cards/joker.svg";
-//       var card = Snap.load(url, function(fragCard) {
-//         groupCard = groupBoard.g()
-//         groupCard.attr({'transform': 't0,0r0,0'})
-//         console.log('card:'+id)
-//         groupCard.node.id = id
-//         groupCard.append(fragCard)
-//         groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
-//       });
-//     }
-//     create_card(i*6+c+'card')
-//   }
-// }
-
-for (var i = 0; i < 6*DogApp.PLAYER_COUNT; i++) {
-  id = i+'card'
-  groupCard = groupBoard.g()
-  groupCard.attr({'transform': 't0,0r0,0'})
-  groupCard.node.id = id
-  groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
-  DogApp.players_cards[i] = groupCard
-}
-
-var name_click = function() {
-  name = window.prompt("Name:", this.node.textContent);
-  if (name) {
-    var msg = { room: DogApp.ROOM, event: 'newName', idx: parseInt(this.node.id), name: name};
-    DogApp.socket.emit("event", msg);
-  }
-}
 
 for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
-  textPlayer = groupBoard.text(0,70, 'Player ' + i)
-  textPlayer.attr({
-    fontSize: '10px',
-    "text-anchor": "middle"
-  });
-  textPlayer.node.id = i+'name'
-  var angle = i*360.0/DogApp.PLAYER_COUNT
-  textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
-  textPlayer.click(name_click)
-}
-
-var button_click = function() {
-  var label = this.node.textContent
-  if (label === 'R') {
-    DogApp.playerIndex = (1+DogApp.playerIndex) % DogApp.PLAYER_COUNT
-    var angle = DogApp.playerIndex*360.0/DogApp.PLAYER_COUNT
-    groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce );
-    return;
-  }
-
-  var msg = { event: 'buttonPressed', label: label};
-  DogApp.socket.emit("event", msg);
-
-  if (label.startsWith('G')) {
-    window.location.reload(false);
-  }
+  var createPlayerName = function(idx) {
+    textPlayer = groupBoard.text(0, 78, 'Player ' + idx)
+    textPlayer.attr({
+      fontSize: '10px',
+      "text-anchor": "middle"
+    });
+    textPlayer.node.id = idx+'name'
+    var angle = idx*360.0/DogApp.PLAYER_COUNT
+    textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
+    textPlayer.click(function() {
+      name = window.prompt("Name:", textPlayer.node.textContent);
+      if (name === "null") {
+        return
+      }
+      var msg = { room: DogApp.ROOM, event: 'newName', idx: idx, name: name};
+      DogApp.socket.emit("event", msg);
+    });
+  };
+  createPlayerName(i)
 }
 
 const buttons = ["C", "R", "2", "3", "4", "5", "6"]
-buttons.forEach(function (text, i) {
-  textButton = snap.text(-120,90-i*12, text)
+buttons.forEach(function (label, i) {
+  textButton = snap.text(-120,90-i*12, label)
   textButton.attr({
     fontSize: '10px',
     "text-anchor": "middle",
     class: 'button'
   });
   textButton.node.id = i+'button'
-  textButton.click(button_click)
+  textButton.click(function() {
+    if (label === 'R') {
+      DogApp.playerIndex = (1+DogApp.playerIndex) % DogApp.PLAYER_COUNT
+      var angle = DogApp.playerIndex*360.0/DogApp.PLAYER_COUNT
+      groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce );
+      return;
+    }
+  
+    var msg = { room: DogApp.ROOM, event: 'buttonPressed', label: label};
+    DogApp.socket.emit("event", msg);
+  });
 });
-
-// var angle = DogApp.playerIndex * 360 / DogApp.playerCount
-// groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
-// groupBoard.attr({transform: 'r' + angle + ',0,0'});
-
 
 //
 // Moving the cicle will emit messages to the server
