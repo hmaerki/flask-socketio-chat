@@ -24,7 +24,9 @@
       BOARD_ID: {{ game.dbc.BOARD_ID }},
       PLAYER_COUNT: {{ game.dgc.PLAYER_COUNT }},
       playerIndex: 0, // TODO: REMOVE
-      players_cards: new Array({{ 6*game.dgc.PLAYER_COUNT }})
+      players_cards: new Array({{ 6*game.dgc.PLAYER_COUNT }}),
+      CARD_HEIGHT: {{ game.dbc.CARD_SIZE.imag }},
+      CARD_WIDTH: {{ game.dbc.CARD_SIZE.real }}
       // card_filebases: "{{game.gameState.card_filebases}}",
       // card_array: new Array({{game.gameState.cards.count}})
       // playerCount:  playerCount ,

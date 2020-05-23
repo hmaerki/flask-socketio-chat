@@ -45,9 +45,9 @@ DOG_BOARD_CONSTANTS_4 = DogBoardConstants(dog_constants_4)
 DOG_BOARD_CONSTANTS_6 = DogBoardConstants(dog_constants_6)
 LIST_DOG_BOARD_CONSTANTS = (DOG_BOARD_CONSTANTS_4, DOG_BOARD_CONSTANTS_6)
 
-DOG_GAME_CONSTANTS_2 = DogGameConstants(2, DOG_BOARD_CONSTANTS_4, ('Blue', 'Green'))
-DOG_GAME_CONSTANTS_4 = DogGameConstants(4, DOG_BOARD_CONSTANTS_4, ('Blue', 'Red', 'Green', 'Yellow'))
-DOG_GAME_CONSTANTS_6 = DogGameConstants(6, DOG_BOARD_CONSTANTS_6, ('Green', 'Black', 'Yellow', 'Blue', 'White', 'Red'))
+DOG_GAME_CONSTANTS_2 = DogGameConstants(2, DOG_BOARD_CONSTANTS_4, ('Blau', 'Grün'))
+DOG_GAME_CONSTANTS_4 = DogGameConstants(4, DOG_BOARD_CONSTANTS_4, ('Blau', 'Gelb', 'Grün', 'Rot'))
+DOG_GAME_CONSTANTS_6 = DogGameConstants(6, DOG_BOARD_CONSTANTS_6, ('Grün', 'Rot', 'Weiss', 'Blau', 'Gelb', 'Schwarz'))
 LIST_DOG_GAME_CONSTANTS = (DOG_GAME_CONSTANTS_2, DOG_GAME_CONSTANTS_4, DOG_GAME_CONSTANTS_6)
 
 

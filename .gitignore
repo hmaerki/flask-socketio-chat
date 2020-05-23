@@ -1,5 +1,5 @@
-static/board4/cards/**
-static/board6/cards/**
+static/img/cards/**
+flask_session
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

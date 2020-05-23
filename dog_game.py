@@ -9,7 +9,7 @@ import dog_patch_cards
 
 logging.basicConfig(level=logging.DEBUG)
 
-dog_patch_cards.CardsPatcher.convert_cards()
+dog_patch_cards.CardsPatcher().convert_cards()
 
 INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 

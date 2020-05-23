@@ -101,29 +101,10 @@ for (var i = 0; i < 6*DogApp.PLAYER_COUNT; i++) {
   DogApp.players_cards[i] = groupCard
 }
 
-// DogApp.card_filebases.split(';').forEach(function (filebase, i) {
-//   id = i+'card'
-//   groupCard = groupBoard.g()
-//   groupCard.attr({'transform': 't0,0r0,0'})
-//   // console.log('card:'+id)
-//   groupCard.node.id = id
-//   groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
-// });
-
-
-// for (var i = 0; i < {{game.gameState.cards.count}}; i++) {
-//   id = i+'card'
-//   groupCard = groupBoard.g()
-//   groupCard.attr({'transform': 't0,0r0,0'})
-//   // console.log('card:'+id)
-//   groupCard.node.id = id
-//   groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
-// }
-
 var name_click = function() {
-  name = window.prompt("Name:", "...");
+  name = window.prompt("Name:", this.node.textContent);
   if (name) {
-    var msg = { event: 'newName', idx: parseInt(this.node.id), name: name};
+    var msg = { room: DogApp.ROOM, event: 'newName', idx: parseInt(this.node.id), name: name};
     DogApp.socket.emit("event", msg);
   }
 }

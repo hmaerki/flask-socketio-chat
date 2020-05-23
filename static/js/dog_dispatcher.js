@@ -3,7 +3,7 @@ $(document).ready(function () {
   DogApp.socket = io.connect('http://' + document.domain + ':' + location.port);
 
   DogApp.socket.on('connect', function () {
-    var msg = { player: DogApp.playerIndex, room: DogApp.ROOM, event: 'browserConnected' };
+    var msg = { room: DogApp.ROOM, event: 'browserConnected' };
     DogApp.socket.emit('event', msg);
   });
 
@@ -56,11 +56,31 @@ $(document).ready(function () {
         var descriptionI18N = card[4]
 
         var groupCard = DogApp.players_cards[i]
-        var svgCard = groupCard.image("/static/board" + DogApp.BOARD_ID + "/cards/" + filebase + ".svg");
+        var svgCard = groupCard.image(
+          "/static/img/cards/" + filebase + ".svg",
+          -DogApp.CARD_WIDTH/2,
+          -DogApp.CARD_HEIGHT/2,
+          DogApp.CARD_WIDTH,
+          DogApp.CARD_HEIGHT
+        );
         svgCard.attr({
           class: "set",
         });
         groupCard.attr({'transform': 't'+x+','+y+'r'+angle+',0,0'});
+
+        var title = Snap.parse('<title>This is a title 2' + filebase + '</title>');
+        // var rect = groupCard.rect(20,20,40,40);
+        groupCard.append( title );
+        
+
+        // function hoverOver() {
+        //   textBox = svgCard.text( this.getBBox().cx, this.getBBox().cy, 'Hallo');
+        // }
+        
+        // function hoverOut() {
+        //   textBox.remove();
+        // }
+        // svgCard.hover(hoverOver, hoverOut);
 
         // placeCard(id, card.slice(0, 3))
 
@@ -158,25 +178,5 @@ $(document).ready(function () {
     }
   });
 
-  $(':button').on('click', function () {
-    var click_msg = { player: DogApp.playerIndex, event: this.id, card: this.name };
-    if (this.id === 'setName') {
-      // Special case: SetName Button
-      name_element = $(`input#player${DogApp.playerIndex}_textfield_name`);
-      click_msg['name'] = name_element.val();
-    }
-    else
-    {
-      // The name-attribute is misued to store the card number
-      click_msg['card'] = this.name;
-    }
-    DogApp.socket.emit('event', click_msg);
-
-    if (this.id === 'rotateBoard') {
-      // Special case: RotateBoard Button
-      location.replace(DogApp.rotateUrl)
-    }
-
-  });
 });
 
