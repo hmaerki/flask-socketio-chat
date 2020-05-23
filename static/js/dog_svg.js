@@ -98,7 +98,7 @@ for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
   createPlayerName(i)
 }
 
-const buttons = ["C", "R", "2", "3", "4", "5", "6"]
+const buttons = ["R", "C", "2", "3", "4", "5", "6"]
 buttons.forEach(function (label, i) {
   textButton = snap.text(-120,90-i*12, label)
   textButton.attr({
