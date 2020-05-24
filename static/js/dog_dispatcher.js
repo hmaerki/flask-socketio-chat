@@ -17,63 +17,41 @@ $(document).ready(function () {
       });
     }
 
-    var opacityCard = function(groupCard) {
-      // Upside down if board flipped m.e + ', ' + m.f
-      m1 = groupCard.transform.baseVal[0].matrix
-      // console.log('card transform:' + m0.e + ', ' + m0.f)
-      x1 = m1.e
-      y1 = m1.f
-
-      // m2 = groupBoard.node.transform.baseVal[0].matrix
-
-      // x2 = + m2.a*x1 - m2.c*y1;
-      // y2 = - m2.b*x1 + m2.d*y1;
-      // console.log('card transform:' + x1 + '/' + y2 + ', ' + x2 + '/' + y2)
-    
-      x = x1
-      y = y1
+    var caluclateCardOpacity = function(x, y) {
       if (y > 100) {
-        opacity = 0.0
+        return 0.0
       } else {
         d = Math.abs(x)+Math.abs(y)
-        opacity = 0.05*(d-25)
+        return 0.05*(d-25)
       }
-
-      // var svg_element1 = $(this).find('rect#mask')
-      // svg_element1.each(function () {
-      //   this.setAttribute('fill', 'red');
-      //   s = Snap(this)
-      //   s.attr({
-      //     'fill': '#00F',
-      //     'opacity': 1.0,
-      //   })
-      // });
-
-      var cardMask = $(groupCard).find('rect#mask')
-      cardMask.each(function () {
-        s = Snap(this)
-        s.attr({ opacity: opacity})
-      });
-
-      // var cm = Snap(cardMask.node)
-      // cm.attr({ opacity: 1.0, fill: 'red' })
-      // console.log('opacity:' + opacity)
     }
 
-    var placeCard = function(id, card) {
-      var angle = card[0]
-      var x = card[1]
-      var y = card[2]
-      var svg_element = $('g#'+id+'card')
-      svg_element.each(function () {
-        this.setAttribute('transform', 'translate('+x+','+y+') rotate('+angle+' 0 0)');
-        opacityCard(this);
-      });
+    var opacityCard = function(groupCard) {
+      m = groupCard.transform().localMatrix
+      x = m.e
+      y = m.f
+
+      opacity = caluclateCardOpacity(x=x, y=y)
+      var cardMask = groupCard.select('rect#mask')
+      cardMask.attr({ opacity: opacity})
     }
-  
+
     var card = json['card']
     if (card) {
-      placeCard(card[0], card[1])
+      var id = card[0]
+      var card_attrs = card[1]
+      var angle = card[1][0]
+      var x = card[1][1]
+      var y = card[1][2]
+
+      var svg_element = $('g#'+id+'card')
+      svg_element.each(function () {
+        var groupCard = Snap(this)
+        groupCard.attr({
+          transform: 't'+x+','+y+'r'+angle+' 0 0',
+        });
+        opacityCard(groupCard);
+      });
     }
 
     var cards = json['cards']
@@ -81,20 +59,18 @@ $(document).ready(function () {
       // Remove existing cards
       $('g.card').remove()
 
-      cards.forEach(function (card, i) {
-        var angle = card[0]
-        var x = card[1]
-        var y = card[2]
-        var filebase = card[3]
-        var descriptionI18N = card[4]
+      cards.forEach(function (card_attrs, i) {
+        var angle = card_attrs[0]
+        var x = card_attrs[1]
+        var y = card_attrs[2]
+        var filebase = card_attrs[3]
+        var descriptionI18N = card_attrs[4]
 
         id = i+'card'
         var groupCard = groupBoard.g()
         groupCard.node.id = id
         groupCard.attr({
           class:'card',
-          // https://www.sitepoint.com/advanced-snap-svg/
-          // mask: rectPlayerClip,
         })
         groupCard.drag(card_drag_move, card_drag_start, card_drag_stop);
 
@@ -112,17 +88,18 @@ $(document).ready(function () {
           DogApp.CARD_HEIGHT,
           3 // radius
         );
-        // svgMask.attr({
-        //   mask: rectPlayerClip,
-        // });
         svgMask.node.id = 'mask'
-        svgMask.attr({ stroke: 'black', 'stroke-width': 0.5, fill: 'gray', 'opacity': 1.0 });
-
-        // groupCard.attr({'transform': 't'+x+','+y+'r'+angle+',0,0'});
-        groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout);
+        opacity = caluclateCardOpacity(x, y)
+        svgMask.attr({
+          // stroke: 'black', 'stroke-width': 0.5,
+          fill: 'gray',
+          opacity: opacity,
+        });
 
         var title = Snap.parse('<title>' + descriptionI18N + '</title>');
         groupCard.append( title );
+
+        groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout);
       });
     }
 
