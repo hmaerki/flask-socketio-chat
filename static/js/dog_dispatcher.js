@@ -68,14 +68,15 @@ $(document).ready(function () {
           -DogApp.CARD_HEIGHT/2,
           DogApp.CARD_WIDTH,
           DogApp.CARD_HEIGHT,
-          3 // radius
+          2 // radius
         );
         svgMask.node.id = 'mask'
         opacity = caluclateCardOpacity(x, y)
         svgMask.attr({
-          // stroke: 'black', 'stroke-width': 0.5,
+          stroke: 'black',
+          'stroke-width': 0.1,
           fill: 'gray',
-          opacity: opacity,
+          // opacity: opacity,
         });
 
         if (opacity < 0.5) {
@@ -84,7 +85,7 @@ $(document).ready(function () {
           groupCard.append(title);
         }
 
-        groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout);
+        groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout, updateOpacity);
       });
     }
 

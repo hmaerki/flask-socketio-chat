@@ -93,32 +93,6 @@ for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
   createPlayerName(i)
 }
 
-var caluclateCardOpacity = function(x, y) {
-  if (y > 100) {
-    return 0.0
-  } else {
-    d = Math.abs(x)+Math.abs(y)
-    return 0.05*(d-25)
-  }
-}
-
-var opacityCard = function(groupCard) {
-  m1 = groupCard.transform().localMatrix
-  x1 = m1.e
-  y1 = m1.f
-
-  m2 = groupBoard.transform().localMatrix
-  // console.log('groupBoard.node.transform.baseVal[0].matrix.: ' + m.a + ', ' + m.b + ', ' + m.c + ', ' + m.d + ', ' + m.e + ', ' + m.f)
-
-  x2 = + m2.a*x1 - m2.c*y1;
-  y2 = - m2.b*x1 + m2.d*y1;
-
-  // TODO: Add transformation for rotation
-  opacity = caluclateCardOpacity(x=x2, y=y2)
-  var cardMask = groupCard.select('rect#mask')
-  cardMask.attr({ opacity: opacity})
-}
-
 const buttons = ["R", "C", "2", "3", "4", "5", "6"]
 buttons.forEach(function (label, i) {
   textButton = snap.text(-120,90-i*12, label)
@@ -128,17 +102,9 @@ buttons.forEach(function (label, i) {
     class: 'button'
   });
   textButton.node.id = i+'button'
-  
+
   textButton.click(function() {
     if (label === 'R') {
-      var updateOpacity = function() {
-        var svg_cards = $('g.card');
-        svg_cards.each(function () {
-            groupCard = Snap(this)
-            opacityCard(groupCard);
-        });
-      }
-
       DogApp.playerIndex = (1+DogApp.playerIndex) % DogApp.PLAYER_COUNT
       var angle = DogApp.playerIndex*360.0/DogApp.PLAYER_COUNT
       groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce, updateOpacity );
@@ -150,8 +116,41 @@ buttons.forEach(function (label, i) {
   });
 });
 
+var caluclateCardOpacity = function(x, y) {
+  if (y > 100) {
+    return 0.0
+  } else {
+    d = Math.abs(x)+Math.abs(y)
+    return 0.05*(d-25)
+  }
+}
+
+var updateOpacity = function() {
+  var svg_cards = $('g.card');
+  svg_cards.each(function () {
+      groupCard = Snap(this)
+      opacityCard(groupCard);
+  });
+}
+
+var opacityCard = function(groupCard) {
+  m1 = groupCard.transform().localMatrix
+  x1 = m1.e
+  y1 = m1.f
+
+  m2 = groupBoard.transform().localMatrix
+
+  x2 = m2.a*x1 + m2.c*y1;
+  y2 = m2.b*x1 + m2.d*y1;
+
+  // TODO: Add transformation for rotation
+  opacity = caluclateCardOpacity(x=x2, y=y2)
+  var cardMask = groupCard.select('rect#mask')
+  cardMask.attr({ opacity: opacity})
+}
+
 //
-// Moving the cicle will emit messages to the server
+// Moving a marble will emit messages to the server
 //
 var move = function (dx, dy, mouseX, mouseY) {
 
