@@ -66,6 +66,18 @@ var card_drag_stop = function () {
 
 
 for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
+
+  var addClick = function(idx, textPlayer) {
+    textPlayer.click(function() {
+      name = window.prompt("Name:", textPlayer.node.textContent);
+      if (name === "null") {
+        return
+      }
+      var msg = { room: DogApp.ROOM, event: 'newName', idx: idx, name: name};
+      DogApp.socket.emit("event", msg);
+    });
+  }
+
   var createPlayerName = function(idx) {
     textPlayer = groupBoard.text(0, 78, 'Player ' + idx)
     textPlayer.attr({
@@ -75,16 +87,36 @@ for (var i = 0; i < DogApp.PLAYER_COUNT; i++) {
     textPlayer.node.id = idx+'name'
     var angle = idx*360.0/DogApp.PLAYER_COUNT
     textPlayer.animate({ transform: 'r' + angle + ',0,0' }, 2000, mina.bounce );
-    textPlayer.click(function() {
-      name = window.prompt("Name:", textPlayer.node.textContent);
-      if (name === "null") {
-        return
-      }
-      var msg = { room: DogApp.ROOM, event: 'newName', idx: idx, name: name};
-      DogApp.socket.emit("event", msg);
-    });
+
+    addClick(idx, textPlayer)
   };
   createPlayerName(i)
+}
+
+var caluclateCardOpacity = function(x, y) {
+  if (y > 100) {
+    return 0.0
+  } else {
+    d = Math.abs(x)+Math.abs(y)
+    return 0.05*(d-25)
+  }
+}
+
+var opacityCard = function(groupCard) {
+  m1 = groupCard.transform().localMatrix
+  x1 = m1.e
+  y1 = m1.f
+
+  m2 = groupBoard.transform().localMatrix
+  // console.log('groupBoard.node.transform.baseVal[0].matrix.: ' + m.a + ', ' + m.b + ', ' + m.c + ', ' + m.d + ', ' + m.e + ', ' + m.f)
+
+  x2 = + m2.a*x1 - m2.c*y1;
+  y2 = - m2.b*x1 + m2.d*y1;
+
+  // TODO: Add transformation for rotation
+  opacity = caluclateCardOpacity(x=x2, y=y2)
+  var cardMask = groupCard.select('rect#mask')
+  cardMask.attr({ opacity: opacity})
 }
 
 const buttons = ["R", "C", "2", "3", "4", "5", "6"]
@@ -96,11 +128,20 @@ buttons.forEach(function (label, i) {
     class: 'button'
   });
   textButton.node.id = i+'button'
+  
   textButton.click(function() {
     if (label === 'R') {
+      var updateOpacity = function() {
+        var svg_cards = $('g.card');
+        svg_cards.each(function () {
+            groupCard = Snap(this)
+            opacityCard(groupCard);
+        });
+      }
+
       DogApp.playerIndex = (1+DogApp.playerIndex) % DogApp.PLAYER_COUNT
       var angle = DogApp.playerIndex*360.0/DogApp.PLAYER_COUNT
-      groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce );
+      groupBoard.animate({ transform: 'r' + angle + ',0,0' }, 3000, mina.bounce, updateOpacity );
       return;
     }
   
@@ -114,7 +155,7 @@ buttons.forEach(function (label, i) {
 //
 var move = function (dx, dy, mouseX, mouseY) {
 
-  m = groupBoard.node.transform.baseVal[0].matrix
+  m = groupBoard.transform().localMatrix
   // console.log('groupBoard.node.transform.baseVal[0].matrix.: ' + m.a + ', ' + m.b + ', ' + m.c + ', ' + m.d + ', ' + m.e + ', ' + m.f)
 
   dx2 = + m.a*dx - m.c*dy;
@@ -131,11 +172,14 @@ var move = function (dx, dy, mouseX, mouseY) {
   // DogApp.socket.emit("move", {id: this.id, cx: this.node.getAttribute("cx"), dx: dx});
   // var move_msg = { id: this.node.id, cx: cx|0, cy: cy|0 }
   // var move_msg = { id: this.node.id, x: cx|0, y: cy|0 }
-  var move_msg = {
-    'svg_id': '#' + this.node.id,
-    'marble': [cx|0, cy|0]
+  if (!this.node.id.startsWith('marble', 0))
+  {
+    console.log('WARNING: Does not start with "marble"!')
   }
-  DogApp.socket.emit("marble", move_msg);
+  var idstr = this.node.id.substring('marble'.length)
+  var idnum = parseInt(idstr)
+  var msg = {room: DogApp.ROOM, marble: [idnum, cx|0, cy|0] }
+  DogApp.socket.emit("marble", msg);
 }
 
 var start = function () {
@@ -149,12 +193,12 @@ var stop = function () {
   console.log('finished dragging');
 }
 
-for (i=0; i<4*DogApp.playerCount; i++) {
-  var circleMarble = groupBoard.image("/static/img/" + DogApp.playerCount + "/marble" + (10+i) + ".png", 0, 0, 8, 8);
+for (i=0; i<4*DogApp.PLAYER_COUNT; i++) {
+  var circleMarble = groupBoard.image("/static/player" + DogApp.PLAYER_COUNT + "/marbles/marble" + (10+i) + ".png", 0, 0, 8, 8);
   circleMarble.attr({
     class: "marble",
-    x: 2*i,
-    y: 1*i
+    x: -200,
+    y: 0,
   });
   circleMarble.node.id="marble"+i
   circleMarble.drag(move, start, stop)

@@ -116,8 +116,10 @@ def handleEvent(json):
 @socketio.on('marble')
 def handleMoveMarble(json: dict):
     print(f'handleMoveMarble Json: {json}\n')
-    game.setMarble(json)
-    socketio.send([json], json=True, broadcast=True)
+    game = rooms.get(json)
+    id, x, y = json['marble']
+    json_msg = game.moveMarble(id=id, x=x, y=y)
+    socketio.send(json_msg, json=True, broadcast=True, room=game.room)
 
 @socketio.on('moveCard')
 def handleMoveCard(json: dict):

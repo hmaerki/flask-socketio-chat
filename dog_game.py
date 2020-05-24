@@ -47,12 +47,30 @@ class PlayersCard:
     def __eq__(self, other):
         return self.__order == other.__order
 
+class Marble:
+    def __init__(self, id:int):
+        self.id = id
+        self.reset()
+
+    def move(self, x:int, y:int):
+        self.__x = x
+        self.__y = y
+
+    def reset(self):
+        self.__x = 2*self.id
+        self.__y = 1*self.id
+
+    @property
+    def json(self):
+        return (self.id, int(self.__x), int(self.__y))
+
 class GameState:
     def __init__(self, game: 'Game', room: str):
         self.cards = dog_cards.Cards()
         self.game = game
         self.room = room
         self.__order = 0
+        self.__list_marbles = [Marble(id) for id in range(self.dgc.PLAYER_COUNT*dog_constants.MARBLE_COUNT)]
         self.reset()
         self.__game_dirty = False
         self.__board_dirty = False
@@ -73,7 +91,12 @@ class GameState:
         self.__game_dirty = True
         self.__board_dirty = True
         self.list_player_names = list(self.dgc.PLAYER_NAMES_DEFAULTS)
-        self.__initializeCards()
+        self.__list_cards = []
+        for marble in self.__list_marbles:
+            marble.reset()
+
+        # self.__initializeCards()
+        # self.__initializeMarbles()
 
     def nextOrder(self) -> int:
         self.__order += 1
@@ -96,6 +119,10 @@ class GameState:
 
         self.cards.shuffle(dog_constants.dogRandom.shuffle)
         self.__list_cards = list(generator())
+
+    def __initializeMarbles(self):
+        for marble in self.__list_marbles:
+            marble.middle()
 
     def boardDirty(self):
         self.__game_dirty = True
@@ -139,6 +166,8 @@ class GameState:
         self.__list_cards.sort()
         json['cards'] = [card.jsonAll for card in self.__list_cards]
 
+        json['marbles'] = [marble.json for marble in self.__list_marbles]
+
     def moveCard(self, id:int, x:int, y:int) -> dict:
         def findCard():
             for card in self.__list_cards:
@@ -150,12 +179,17 @@ class GameState:
         card.move(x=x, y=y)
         return { 'card': card.jsonMove }
 
+    def moveMarble(self, id:int, x:int, y:int) -> dict:
+        marble = self.__list_marbles[id]
+        marble.move(x=x, y=y)
+        return { 'marble': marble.json }
+
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False
 
     def button_C(self):
         # Clean
-        self.__initializeCards(0)
+        self.reset()
         self.gameDirty()
 
     def button_2(self):
@@ -198,14 +232,8 @@ class Game:
     def moveCard(self, id:int, x:int, y:int) -> dict:
         return self.gameState.moveCard(id=id, x=x, y=y)
 
-    def getAssistance(self):
-        return self.gameState.getAssistance()
-
-    def getPlayer(self, index: int) -> 'PlayerState':
-        return self.gameState.getPlayer(index)
-    
-    def setMarble(self, dictPosition: dict) -> None:
-        self.gameState.setMarble(dictPosition)
+    def moveMarble(self, id:int, x:int, y:int) -> dict:
+        return self.gameState.moveMarble(id=id, x=x, y=y)
 
     @property
     def dbc(self) -> dog_constants.DogBoardConstants:
@@ -215,27 +243,3 @@ class Game:
     def room(self) -> str:
         return self.gameState.room
 
-    # @property
-    # def card_urls_as_javascript(self) -> str:
-    #     l = [f"'{url}'" for url in self.__gameState.card_urls]
-    #     return f'[{",".join(l)}]'
-
-    # @property
-    # def template_params(self):
-    #     # playerIndexNext = (playerIndex+1)%game.player_count
-    #     playerIndex = 2
-    #     playerIndexNext = 42
-    #     rotateUrl = 'xy' # f'{flask.request.url_root}{playerIndexNext}'
-    #     params = dict(
-    #         game = self,
-    #         playerCount = self.dgc.PLAYER_COUNT,
-    #         playerIndex = playerIndex,
-    #         rotateUrl = rotateUrl
-    #     )
-    #     return params
-
-
-if __name__ == '__main__':
-  import doctest
-  failures, tests = doctest.testmod()
-  print('SUCCESS' if failures == 0 else f'{failures} FAILURES')

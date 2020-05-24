@@ -17,26 +17,6 @@ $(document).ready(function () {
       });
     }
 
-    var caluclateCardOpacity = function(x, y) {
-      if (y > 100) {
-        return 0.0
-      } else {
-        d = Math.abs(x)+Math.abs(y)
-        return 0.05*(d-25)
-      }
-    }
-
-    var opacityCard = function(groupCard) {
-      m = groupCard.transform().localMatrix
-      x = m.e
-      y = m.f
-
-      // TODO: Add transformation for rotation
-      opacity = caluclateCardOpacity(x=x, y=y)
-      var cardMask = groupCard.select('rect#mask')
-      cardMask.attr({ opacity: opacity})
-    }
-
     var card = json['card']
     if (card) {
       var idnum = card[0]
@@ -108,34 +88,30 @@ $(document).ready(function () {
       });
     }
 
-    for (var i = 0; i < json.length; i++) { 
-      var command = json[i]
-      var svg_id = command['svg_id']
-      if (svg_id) {
-        var svg_element = $(svg_id);
-        attr_set = command['attr_set']
-        if (attr_set) {
-          svg_element.each(function () {
-            for (var attr_name in attr_set) {
-              attr_value = attr_set[attr_name];
-              this.setAttribute(attr_name, attr_value);
-            };
-          });
-        }
-        marble = command['marble']
-        if (marble) {
-          x = marble[0]
-          y = marble[1]
-          svg_element.each(function () {
-            this.setAttribute('x', x);
-            this.setAttribute('y', y);
-          });
-        }
-        continue
-      }
-      console.log('Unknown command: ' + command);
-    };
-  });
+    var moveMarble = function(marble_attrs) {
+      var idnum = marble_attrs[0]
+      var x = marble_attrs[1]
+      var y = marble_attrs[2]
 
+      marble = groupBoard.select('image#marble'+idnum)
+
+      marble.attr({
+        x: x,
+        y: y,
+      });
+    }
+  
+    var marble = json['marble']
+    if (marble) {
+      moveMarble(marble)
+    }
+
+    var marbles = json['marbles']
+    if (marbles) {
+      marbles.forEach(function (marble_attrs, i) {
+          moveMarble(marble_attrs)
+      });
+    }
+});
 });
 
