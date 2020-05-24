@@ -33,17 +33,6 @@ class CardsPatcher(xml.sax.saxutils.XMLFilterBase):
 
         super().startElement(name, attrs)
 
-    def endElement(self, name):
-        if name == 'svg':
-            assert self.__rect is not None
-            self.__rect['fill'] = 'lightgray'
-            self.__rect['opacity'] = '0.0'
-            self.__rect['id'] = 'mask'
-            super().startElement('rect', self.__rect)
-            super().endElement('rect')
-
-        super().endElement(name)
-
     def convert_cards(self):
         if not DIRECTORY_CARDS_NEW.exists():
             DIRECTORY_CARDS_NEW.mkdir(parents=True)
