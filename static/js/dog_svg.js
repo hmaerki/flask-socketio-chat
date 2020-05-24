@@ -39,7 +39,13 @@ var card_drag_move = function (dx, dy, mouseX, mouseY) {
   cx = DogApp.start_card_drag_x + dx2;
   cy = DogApp.start_card_drag_y + dy2;
 
-  var msg = {room: DogApp.ROOM, card: [parseInt(this.node.id), cx|0, cy|0]}
+  if (!this.node.id.startsWith('card', 0))
+  {
+    console.log('WARNING: Does not start with "card"!')
+  }
+  var idstr = this.node.id.substring('card'.length)
+  var idnum = parseInt(idstr)
+  var msg = {room: DogApp.ROOM, card: [idnum, cx|0, cy|0]}
   // console.log(msg)
   DogApp.socket.emit("moveCard", msg);
 }

@@ -44,38 +44,15 @@ $(document).ready(function () {
       var x = card[2]
       var y = card[3]
 
-      var svgGroupCard = $('g#'+idnum+'card')
+      groupCard = groupBoard.select('g#card'+idnum)
 
-      // var svgGroupBoard = $('g.board')
-      // svgLastElement = svgGroupBoard.last()
-      // svgLastElement.after(svgGroupCard)
-
-      // var svgGroupBoard = svgGroupCard.parent()
-      // svgLastElement = svgGroupBoard.last()
-      // svgLastElement.after(svgGroupCard)
-
-      svgGroupCard.each(function () {
-        // var svgGroupBoard = $(this).parent()
-        // svgLastElement = svgGroupBoard.last()
-        // svgLastElement.after(this)
-        var groupCard = Snap(this)
-        groupCard.attr({
-          transform: 't'+x+','+y+'r'+angle+' 0 0',
-        });
-        opacityCard(groupCard);
-
-        // Move card to top
-        // groupBoard.remove(groupCard)
-        groupBoard.append(groupCard)
+      groupCard.attr({
+        transform: 't'+x+','+y+'r'+angle+' 0 0',
       });
-
-
+      opacityCard(groupCard);
   
       // Show this card on the top
-      // svgLastElement = groupBoard.last()
-
-      // groupCard = Snap(svgGroupCard.node)
-      // groupBoard.append(groupCard)
+      groupBoard.append(groupCard)
     }
 
     var cards = json['cards']
@@ -91,7 +68,7 @@ $(document).ready(function () {
         var filebase = card_attrs[4]
         var descriptionI18N = card_attrs[5]
 
-        id = idnum+'card'
+        id = 'card'+idnum
         var groupCard = groupBoard.g()
         groupCard.node.id = id
         groupCard.attr({
@@ -121,9 +98,11 @@ $(document).ready(function () {
           opacity: opacity,
         });
 
-        // TODO: Prevent help text to be displayed if card is hidden (or opacity<=0.0)
-        var title = Snap.parse('<title>' + descriptionI18N + '</title>');
-        groupCard.append(title);
+        if (opacity < 0.5) {
+          // Prevent help text to be displayed if card is hidden
+          var title = Snap.parse('<title>' + descriptionI18N + '</title>');
+          groupCard.append(title);
+        }
 
         groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout);
       });

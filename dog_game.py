@@ -84,10 +84,10 @@ class GameState:
             for playerIndex in range(self.dgc.PLAYER_COUNT):
                 angleDeg = 360.0 * playerIndex / self.dgc.PLAYER_COUNT
                 playerAngle = 2 * math.pi * playerIndex / self.dgc.PLAYER_COUNT
-                for cardIndex, cardCenter in enumerate(self.dbc.LIST_CARD_CENTER):
-                    if cardIndex >= cards:
-                        continue
-                    id = playerIndex*self.dgc.PLAYER_COUNT + cardIndex
+                for cardIndex in range(cards):
+                    cardCenter = self.dbc.LIST_CARD_CENTER[cardIndex]
+                    PLAYER_OFFSET = 10  # The first player start with 10, then 20, ...
+                    id = PLAYER_OFFSET*(1+playerIndex) + cardIndex
                     cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
                     x_initial = cardCenterRotated.real
                     y_initial = cardCenterRotated.imag
