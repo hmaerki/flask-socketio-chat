@@ -16,8 +16,8 @@ INITIAL_NAME = ('Asterix', 'Obelix', 'Trubadix', 'Idefix')
 class PlayersCard:
     def __init__(self, gameState: 'GameState', id: int, angle: int, x_initial: int, y_initial: int, card: dog_cards.Card):
         self.__gameState = gameState
-        self.__id = id
-        self.__layer = 0
+        self.id = id
+        self.__order = self.__gameState.nextOrder()
         self.__angle = angle
         self.__x = x_initial
         self.__y = y_initial
@@ -28,23 +28,31 @@ class PlayersCard:
     def move(self, x:int, y:int):
         self.__x = x
         self.__y = y
+        self.__order = self.__gameState.nextOrder()
 
     def setCard(self, card: dog_cards.Card):
         self.__card = card
 
     @property
     def jsonMove(self):
-        return (int(self.__angle), int(self.__x), int(self.__y))
+        return (self.id, int(self.__angle), int(self.__x), int(self.__y))
 
     @property
     def jsonAll(self):
-        return (int(self.__angle), int(self.__x), int(self.__y), self.__card.filebase, self.__card.descriptionI18N)
+        return (self.id, int(self.__angle), int(self.__x), int(self.__y), self.__card.filebase, self.__card.descriptionI18N)
+
+    def __lt__(self, other):
+        return self.__order < other.__order
+    
+    def __eq__(self, other):
+        return self.__order == other.__order
 
 class GameState:
     def __init__(self, game: 'Game', room: str):
         self.cards = dog_cards.Cards()
         self.game = game
         self.room = room
+        self.__order = 0
         self.reset()
         self.__game_dirty = False
         self.__board_dirty = False
@@ -66,6 +74,10 @@ class GameState:
         self.__board_dirty = True
         self.list_player_names = list(self.dgc.PLAYER_NAMES_DEFAULTS)
         self.__initializeCards()
+
+    def nextOrder(self) -> int:
+        self.__order += 1
+        return self.__order
 
     def __initializeCards(self, cards=0):
         def generator():
@@ -124,12 +136,19 @@ class GameState:
         self.__game_dirty = False
         json['playerNames'] = self.list_player_names
 
+        self.__list_cards.sort()
         json['cards'] = [card.jsonAll for card in self.__list_cards]
 
     def moveCard(self, id:int, x:int, y:int) -> dict:
-        card = self.__list_cards[id]
+        def findCard():
+            for card in self.__list_cards:
+                if card.id == id:
+                    return card
+            raise Exception('Card not found')
+
+        card = findCard()
         card.move(x=x, y=y)
-        return {'card': (id, card.jsonMove)}
+        return { 'card': card.jsonMove }
 
     def appendStateBoard(self, json: dict) -> None:
         self.__board_dirty = False

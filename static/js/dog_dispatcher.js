@@ -31,6 +31,7 @@ $(document).ready(function () {
       x = m.e
       y = m.f
 
+      // TODO: Add transformation for rotation
       opacity = caluclateCardOpacity(x=x, y=y)
       var cardMask = groupCard.select('rect#mask')
       cardMask.attr({ opacity: opacity})
@@ -38,20 +39,43 @@ $(document).ready(function () {
 
     var card = json['card']
     if (card) {
-      var id = card[0]
-      var card_attrs = card[1]
-      var angle = card[1][0]
-      var x = card[1][1]
-      var y = card[1][2]
+      var idnum = card[0]
+      var angle = card[1]
+      var x = card[2]
+      var y = card[3]
 
-      var svg_element = $('g#'+id+'card')
-      svg_element.each(function () {
+      var svgGroupCard = $('g#'+idnum+'card')
+
+      // var svgGroupBoard = $('g.board')
+      // svgLastElement = svgGroupBoard.last()
+      // svgLastElement.after(svgGroupCard)
+
+      // var svgGroupBoard = svgGroupCard.parent()
+      // svgLastElement = svgGroupBoard.last()
+      // svgLastElement.after(svgGroupCard)
+
+      svgGroupCard.each(function () {
+        // var svgGroupBoard = $(this).parent()
+        // svgLastElement = svgGroupBoard.last()
+        // svgLastElement.after(this)
         var groupCard = Snap(this)
         groupCard.attr({
           transform: 't'+x+','+y+'r'+angle+' 0 0',
         });
         opacityCard(groupCard);
+
+        // Move card to top
+        groupBoard.remove(groupCard)
+        groupBoard.append(groupCard)
       });
+
+
+  
+      // Show this card on the top
+      // svgLastElement = groupBoard.last()
+
+      // groupCard = Snap(svgGroupCard.node)
+      // groupBoard.append(groupCard)
     }
 
     var cards = json['cards']
@@ -60,13 +84,14 @@ $(document).ready(function () {
       $('g.card').remove()
 
       cards.forEach(function (card_attrs, i) {
-        var angle = card_attrs[0]
-        var x = card_attrs[1]
-        var y = card_attrs[2]
-        var filebase = card_attrs[3]
-        var descriptionI18N = card_attrs[4]
+        var idnum = card_attrs[0]
+        var angle = card_attrs[1]
+        var x = card_attrs[2]
+        var y = card_attrs[3]
+        var filebase = card_attrs[4]
+        var descriptionI18N = card_attrs[5]
 
-        id = i+'card'
+        id = idnum+'card'
         var groupCard = groupBoard.g()
         groupCard.node.id = id
         groupCard.attr({
@@ -96,14 +121,14 @@ $(document).ready(function () {
           opacity: opacity,
         });
 
+        // TODO: Prevent help text to be displayed if card is hidden (or opacity<=0.0)
         var title = Snap.parse('<title>' + descriptionI18N + '</title>');
-        groupCard.append( title );
+        groupCard.append(title);
 
         groupCard.animate({'transform': 't'+x+','+y+'r'+angle+',0,0'}, 3000, mina.backout);
       });
     }
 
-      // console.log('Received "json": ' + JSON.stringify(json));
     for (var i = 0; i < json.length; i++) { 
       var command = json[i]
       var svg_id = command['svg_id']
@@ -129,53 +154,8 @@ $(document).ready(function () {
         }
         continue
       }
-      var html_id = command['html_id']
-      if (html_id) {
-        // Correspnds to:
-        // 'call_html': {
-        //     'id': '#time',
-        //     'calls': {
-        //         'html': str_time
-        //     }
-        // }
-        // $('#time').html(str_time);
-        var html_element = $(html_id);
-        var html_calls = command['call']
-        if (html_calls) {
-          for (var html_call in html_calls) {
-            html_call_argument = html_calls[html_call];
-            html_element[html_call].call(html_element, html_call_argument)
-          };
-        }
-        var attr_set = command['attr_set']
-        if (attr_set) {
-          html_element.each(function () {
-            for (var attr_name in attr_set) {
-              var attr_value = attr_set[attr_name];
-              $(this).attr(attr_name, attr_value)
-            };
-          });
-        }
-        var attr_set = command['html']
-        if (attr_set) {
-          html_element.each(function () {
-            $(this).html(attr_set)
-          });
-        }
-        continue
-      }
       console.log('Unknown command: ' + command);
     };
-  });
-
-  DogApp.socket.on('message', function (msg) {
-    // console.log('Received "message": ' + msg);
-    var i = msg.indexOf(':');
-    var method = msg.slice(0, i)
-    var text = msg.slice(i + 1)
-    if (method == 'MESSAGE') {
-      $('#messages').append('<li>' + text + '</li>');
-    }
   });
 
 });

@@ -1,9 +1,3 @@
-// http://snapsvg.io/docs/
-// http://snapsvg.io/demos/
-// http://snapsvg.io/start/
-// http://svg.dabbles.info/snaptut-responsive
-// https://wiki.selfhtml.org/wiki/SVG/Tutorials/Einstieg/SVG_in_responsiven_Webseiten
-// https://css-tricks.com/scale-svg/
 
 // First lets create our drawing surface out of existing SVG element
 // If you want to create new surface just provide dimensions
@@ -15,7 +9,7 @@ snap.attr({ viewBox: "-140 -140 280 280" });
 
 groupBoard = snap.g()
 // A initial transformation is needed!
-groupBoard.attr({transform: 'r0,0,0'});
+groupBoard.attr({transform: 'r0,0,0', class: 'board'});
 
 //
 // The board
@@ -26,20 +20,6 @@ board.attr({
   class: "board",
   mask: circleMask
 })
-
-//
-// Load all cards
-//
-// DogApp.card_filebases.split(';').forEach(function (filebase, i) {
-//   var svgCard = groupBoard.image("/static/board" + DogApp.BOARD_ID + "/cards/" + filebase + ".svg");
-//   svgCard.attr({
-//     class: "set",
-//     x: 2*i,
-//     y: 1*i
-//   });
-//   svgCard.node.id="set"+i
-//   DogApp.card_array[i] = svgCard
-// });
 
 
 //
@@ -69,6 +49,9 @@ var card_drag_start = function () {
 
   DogApp.start_card_drag_x = m.e;
   DogApp.start_card_drag_y = m.f;
+
+  // Move card to top
+  // groupBoard.append(this)
 }
 
 var card_drag_stop = function () {
