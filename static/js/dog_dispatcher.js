@@ -65,7 +65,7 @@ $(document).ready(function () {
         opacityCard(groupCard);
 
         // Move card to top
-        groupBoard.remove(groupCard)
+        // groupBoard.remove(groupCard)
         groupBoard.append(groupCard)
       });
 
