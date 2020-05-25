@@ -15,7 +15,7 @@ MARBLE_COUNT = 4
 LIST_PLAYER_COUNT = (2, 4, 6)
 LIST_BOARD_ID = (4, 6)
 BOARD_CENTER = 0,0
-BOARD_DIAMETER = 200
+BOARD_DIAMETER = 2000
 
 class DogBoardConstants:
     def __init__(self, dbc_module: 'module'):
