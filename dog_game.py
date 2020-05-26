@@ -66,7 +66,6 @@ class Marble:
 
 class GameState:
     def __init__(self, game: 'Game', room: str):
-        self.cards = dog_cards.Cards()
         self.game = game
         self.room = room
         self.__order = 0
@@ -83,9 +82,9 @@ class GameState:
     def dbc(self) -> dog_constants.DogGameConstants:
         return self.game.dbc
 
-    @property
-    def card_filebases(self) -> list:
-        return ';'.join([card.filebase for card in self.cards.all])
+    # @property
+    # def card_filebases(self) -> list:
+    #     return ';'.join([card.filebase for card in self.cards.all])
 
     def reset(self) -> None:
         self.__game_dirty = True
@@ -104,6 +103,8 @@ class GameState:
 
     def __initializeCards(self, cards=0):
         def generator():
+            cardstack = dog_cards.Cards()
+            cardstack.shuffle(dog_constants.dogRandom.shuffle)
             for playerIndex in range(self.dgc.PLAYER_COUNT):
                 angleDeg = 360.0 * playerIndex / self.dgc.PLAYER_COUNT
                 playerAngle = 2 * math.pi * playerIndex / self.dgc.PLAYER_COUNT
@@ -114,10 +115,9 @@ class GameState:
                     cardCenterRotated = math.e**(complex(0, playerAngle)) * cardCenter
                     x_initial = cardCenterRotated.real
                     y_initial = cardCenterRotated.imag
-                    card = self.cards.pop_card()
+                    card = cardstack.pop_card()
                     yield PlayersCard(gameState=self, id=id, angle=angleDeg, x_initial=x_initial, y_initial=y_initial, card=card)
 
-        self.cards.shuffle(dog_constants.dogRandom.shuffle)
         self.__list_cards = list(generator())
 
     def __initializeMarbles(self):
