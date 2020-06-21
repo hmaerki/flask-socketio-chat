@@ -18,7 +18,6 @@ app.config['SECRET_KEY'] = 'mysecret'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.jinja_env.undefined = jinja2.StrictUndefined
 
-# TODO: Does not work
 '''
 https://medium.com/hackervalleystudio/weekend-project-part-1-creating-a-real-time-web-based-application-using-flask-vue-and-socket-b71c73f37df7
 https://medium.com/hackervalleystudio/weekend-project-part-2-turning-flask-into-a-real-time-websocket-server-using-flask-socketio-ab6b45f1d896
@@ -66,38 +65,14 @@ rooms = Rooms()
 
 @socketio.on('message')
 def handleMessage(msg):
-    print(f'Message: {msg}\n')
+    if DEBUG:
+        print(f'Message: {msg}\n')
     socketio.send(f'MESSAGE:{msg}', broadcast=True)
-
-# def sendGameState():
-#     try:
-#         json_command = {}
-#         game.appendState(json_command)
-#         socketio.send(json_command, json=True, broadcast=True)
-#     except Exception as e:
-#         logging.error(f'******************* Error during game.event(): {e}')
-#         raise
 
 @socketio.on('event')
 def handleEvent(json):
-    print(f'Json: {json}\n')
-
-    # for tag in ('player', 'card'):
-    #     text = json.get(tag, None)
-    #     if text is None:
-    #         continue
-    #     if text == '':
-    #         del json[tag]
-    #         continue
-    #     json[tag] = int(text)
-
-    # str_event = json.get('event', None)
-    # if str_event is not None:
-    #     match_event = dog_html.ReEvent.search(str_event)
-    #     if match_event is not None:
-    #         # player5_changeCard
-    #         json['event'] = match_event.event
-    #         json['player'] = int(match_event.player)
+    if DEBUG:
+        print(f'Json: {json}\n')
     try:
         if json['event'] == 'browserConnected':
             room = json['room']
@@ -115,7 +90,8 @@ def handleEvent(json):
 
 @socketio.on('marble')
 def handleMoveMarble(json: dict):
-    print(f'handleMoveMarble Json: {json}\n')
+    if DEBUG:
+        print(f'handleMoveMarble Json: {json}\n')
     game = rooms.get(json)
     id, x, y = json['marble']
     json_msg = game.moveMarble(id=id, x=x, y=y)
@@ -123,7 +99,8 @@ def handleMoveMarble(json: dict):
 
 @socketio.on('moveCard')
 def handleMoveCard(json: dict):
-    print(f'handleMoveCard Json: {json}\n')
+    if DEBUG:
+        print(f'handleMoveCard Json: {json}\n')
     game = rooms.get(json)
     id, x, y = json['card']
     json_msg = game.moveCard(id=id, x=x, y=y)
@@ -150,13 +127,16 @@ def debugjson():
     content_type = flask.request.headers['Content-Type']
     if content_type == 'application/x-www-form-urlencoded':
         data_json = flask.json.loads(flask.request.get_data().decode("utf-8"))
-        print(f'debugjson: {data_json}\n')
+        if DEBUG:
+            print(f'debugjson: {data_json}\n')
         socketio.send(data_json, json=True, broadcast=True)
         return 'Yes'
     return 'No'
 
     # curl -X POST http://localhost:5000/debugjson -d @set_all_1.json 
 
+# This is how to run a timer
+#
 # def timer_run():
 #     while True:
 #         str_time = time.strftime('%H:%M:%S')
